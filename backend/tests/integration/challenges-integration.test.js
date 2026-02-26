@@ -270,4 +270,176 @@ describe('Challenges Integration Tests', () => {
             expect(res.status).toBe(401);
         });
     });
+
+    describe('POST /api/challenges/generate-advanced', () => {
+        it('generates a comprehensive challenge with full prompt.txt specification', async () => {
+            const advancedToken = jwt.sign({ id: '507f1f77bcf86cd799439015', role: 'student' }, process.env.JWT_SECRET);
+            
+            prisma.user.findUnique.mockResolvedValue({ id: '507f1f77bcf86cd799439015', level: 3 });
+            
+            const mockAdvancedChallenge = {
+                title: 'Binary Search Implementation',
+                difficulty: 'Medium',
+                topic: 'arrays',
+                problem_style: 'Algorithmic',
+                language: 'Python',
+                problem_statement: 'Implement binary search algorithm to find element in sorted array',
+                input_format: 'A sorted array and target value',
+                output_format: 'Index of target or -1 if not found',
+                constraints: ['1 <= arr.length <= 10^4', '-10^4 <= arr[i] <= 10^4'],
+                examples: [
+                    {
+                        input: '[1, 2, 3, 4, 5], target=3',
+                        output: '2',
+                        explanation: 'Element 3 is at index 2'
+                    }
+                ],
+                starter_code: 'def binary_search(arr, target):\n    # Your code here\n    pass',
+                reference_solution: 'def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1',
+                time_complexity: 'O(log n)',
+                space_complexity: 'O(1)',
+                edge_cases: ['Empty array', 'Single element', 'Target not found'],
+                hints: ['Think about dividing the search space in half', 'Use two pointers'],
+                test_cases: [
+                    { input: '[1,2,3,4,5], 3', expected_output: '2' },
+                    { input: '[1,2,3,4,5], 6', expected_output: '-1' }
+                ]
+            };
+
+            nock('https://api.groq.com')
+                .post('/openai/v1/chat/completions')
+                .reply(200, {
+                    choices: [{ message: { content: JSON.stringify(mockAdvancedChallenge) } }]
+                });
+
+            prisma.challenge.create.mockResolvedValue({
+                id: 'challenge-advanced-1',
+                title: mockAdvancedChallenge.title,
+                description: mockAdvancedChallenge.problem_statement,
+                difficulty: 3,
+                language: mockAdvancedChallenge.language,
+                rubric: 'Test rubric',
+                difficultyExplanation: 'Test explanation',
+                topic: mockAdvancedChallenge.topic,
+                problemStyle: mockAdvancedChallenge.problem_style,
+                inputFormat: mockAdvancedChallenge.input_format,
+                outputFormat: mockAdvancedChallenge.output_format,
+                constraints: JSON.stringify(mockAdvancedChallenge.constraints),
+                examples: JSON.stringify(mockAdvancedChallenge.examples),
+                starterCode: mockAdvancedChallenge.starter_code,
+                referenceSolution: mockAdvancedChallenge.reference_solution,
+                timeComplexity: mockAdvancedChallenge.time_complexity,
+                spaceComplexity: mockAdvancedChallenge.space_complexity,
+                edgeCases: JSON.stringify(mockAdvancedChallenge.edge_cases),
+                hints: JSON.stringify(mockAdvancedChallenge.hints),
+                testCases: JSON.stringify(mockAdvancedChallenge.test_cases),
+            });
+
+            const res = await request(app)
+                .post('/api/challenges/generate-advanced')
+                .set('Authorization', `Bearer ${advancedToken}`)
+                .send({
+                    language: 'Python',
+                    difficulty: 'Medium',
+                    topic: 'arrays',
+                    problemStyle: 'Algorithmic',
+                    outputLength: 'Medium',
+                    includeHints: true,
+                    includeTests: true
+                });
+
+            expect(res.status).toBe(201);
+            expect(res.body.title).toBe('Binary Search Implementation');
+            expect(res.body.topic).toBe('arrays');
+            expect(res.body.problemStyle).toBe('Algorithmic');
+            expect(res.body.timeComplexity).toBe('O(log n)');
+        });
+
+        it('validates input parameters', async () => {
+            const validToken = jwt.sign({ id: '507f1f77bcf86cd799439016', role: 'student' }, process.env.JWT_SECRET);
+
+            const res = await request(app)
+                .post('/api/challenges/generate-advanced')
+                .set('Authorization', `Bearer ${validToken}`)
+                .send({
+                    language: 'InvalidLanguage', // Should fail validation
+                    difficulty: 'Medium',
+                });
+
+            expect(res.status).toBe(400);
+            expect(res.body.error).toBe('Invalid input parameters');
+        });
+
+        it('uses default values for optional parameters', async () => {
+            const defaultToken = jwt.sign({ id: '507f1f77bcf86cd799439017', role: 'student' }, process.env.JWT_SECRET);
+            
+            const mockChallenge = {
+                title: 'Array Sum',
+                difficulty: 'Beginner',
+                topic: 'arrays',
+                problem_style: 'Algorithmic',
+                language: 'JavaScript',
+                problem_statement: 'Calculate sum of array',
+                input_format: 'Array of numbers',
+                output_format: 'Sum as number',
+                constraints: ['1 <= arr.length <= 100'],
+                examples: [{ input: '[1,2,3]', output: '6', explanation: '1+2+3=6' }],
+                starter_code: 'function arraySum(arr) {\n  // Your code\n}',
+                reference_solution: 'function arraySum(arr) {\n  return arr.reduce((a,b) => a+b, 0);\n}',
+                time_complexity: 'O(n)',
+                space_complexity: 'O(1)',
+                edge_cases: ['Empty array'],
+                hints: ['Use a loop or reduce'],
+                test_cases: [{ input: '[1,2,3]', expected_output: '6' }]
+            };
+
+            nock('https://api.groq.com')
+                .post('/openai/v1/chat/completions')
+                .reply(200, {
+                    choices: [{ message: { content: JSON.stringify(mockChallenge) } }]
+                });
+
+            prisma.challenge.create.mockResolvedValue({
+                id: 'challenge-default-1',
+                title: mockChallenge.title,
+                description: mockChallenge.problem_statement,
+                difficulty: 1,
+                language: mockChallenge.language,
+                rubric: 'Test rubric',
+                difficultyExplanation: 'Test explanation',
+                topic: mockChallenge.topic,
+                problemStyle: mockChallenge.problem_style,
+                inputFormat: mockChallenge.input_format,
+                outputFormat: mockChallenge.output_format,
+                constraints: JSON.stringify(mockChallenge.constraints),
+                examples: JSON.stringify(mockChallenge.examples),
+                starterCode: mockChallenge.starter_code,
+                referenceSolution: mockChallenge.reference_solution,
+                timeComplexity: mockChallenge.time_complexity,
+                spaceComplexity: mockChallenge.space_complexity,
+                edgeCases: JSON.stringify(mockChallenge.edge_cases),
+                hints: JSON.stringify(mockChallenge.hints),
+                testCases: JSON.stringify(mockChallenge.test_cases),
+            });
+
+            const res = await request(app)
+                .post('/api/challenges/generate-advanced')
+                .set('Authorization', `Bearer ${defaultToken}`)
+                .send({}); // Empty body, should use defaults
+
+            expect(res.status).toBe(201);
+            expect(res.body.language).toBe('JavaScript'); // Default
+        });
+
+        it('requires authentication', async () => {
+            const res = await request(app)
+                .post('/api/challenges/generate-advanced')
+                .send({
+                    language: 'Python',
+                    difficulty: 'Medium'
+                });
+
+            expect(res.status).toBe(401);
+        });
+    });
 });

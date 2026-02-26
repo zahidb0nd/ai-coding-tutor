@@ -2,9 +2,20 @@ const express = require('express');
 const { z } = require('zod');
 const prisma = require('../lib/prisma');
 const authMiddleware = require('../middleware/auth');
-const { generateChallenge, getHint } = require('../services/aiService');
+const { generateChallenge, generateChallengeFromSpec, getHint } = require('../services/aiService');
 
 const router = express.Router();
+
+// Validation schemas
+const generateChallengeSchema = z.object({
+    language: z.enum(['C', 'C++', 'Java', 'JavaScript', 'Python']).optional().default('JavaScript'),
+    difficulty: z.enum(['Beginner', 'Easy', 'Medium', 'Hard', 'Expert']).optional().default('Beginner'),
+    topic: z.string().optional().default('arrays'),
+    problemStyle: z.enum(['Algorithmic', 'Real-world', 'Debugging', 'Code Completion', 'Optimization']).optional().default('Algorithmic'),
+    outputLength: z.enum(['Short', 'Medium', 'Long']).optional().default('Medium'),
+    includeHints: z.boolean().optional().default(true),
+    includeTests: z.boolean().optional().default(true),
+});
 
 // Rate limiting map for basic protection
 const generationRates = new Map();
@@ -96,11 +107,10 @@ router.post('/:id/hint', authMiddleware, async (req, res) => {
     }
 });
 
-// POST /api/challenges/generate — Generate a new challenge with AI
+// POST /api/challenges/generate — Generate a new challenge with AI (legacy endpoint)
 router.post('/generate', authMiddleware, async (req, res) => {
     try {
-        const userId = req.user?.id; // from auth middleware, although req.user might be an object
-        // Wait, auth middleware payload format in this repo: req.user = decoded token { id: string }
+        const userId = req.user?.id;
 
         // Basic rate limit: 1 request per minute per user
         if (userId) {
@@ -122,25 +132,101 @@ router.post('/generate', authMiddleware, async (req, res) => {
             if (user) level = user.level;
         }
 
-        // Generate challenge from AI
-        // generateChallenge(level, language, recentTopics)
+        // Generate challenge from AI (legacy method)
         const generated = await generateChallenge(level, requestedLanguage, []);
 
-        // Save to DB
+        // Save to DB with all new fields
         const challenge = await prisma.challenge.create({
             data: {
                 title: generated.title,
-                description: generated.description,
+                description: generated.problem_statement || generated.description,
                 difficulty: generated.difficulty,
                 language: generated.language,
                 rubric: generated.rubric,
                 difficultyExplanation: generated.difficultyExplanation,
+                topic: generated.topic,
+                problemStyle: generated.problem_style,
+                inputFormat: generated.input_format,
+                outputFormat: generated.output_format,
+                constraints: generated.constraints ? JSON.stringify(generated.constraints) : null,
+                examples: generated.examples ? JSON.stringify(generated.examples) : null,
+                starterCode: generated.starter_code,
+                referenceSolution: generated.reference_solution,
+                timeComplexity: generated.time_complexity,
+                spaceComplexity: generated.space_complexity,
+                edgeCases: generated.edge_cases ? JSON.stringify(generated.edge_cases) : null,
+                hints: generated.hints ? JSON.stringify(generated.hints) : null,
+                testCases: generated.test_cases ? JSON.stringify(generated.test_cases) : null,
             }
         });
 
         res.status(201).json(challenge);
     } catch (err) {
         console.error('Generate challenge error:', err);
+        res.status(500).json({ error: 'Failed to generate challenge. Please try again.' });
+    }
+});
+
+// POST /api/challenges/generate-advanced — Generate challenge with full prompt.txt specification
+router.post('/generate-advanced', authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user?.id;
+
+        // Basic rate limit: 1 request per minute per user
+        if (userId) {
+            const lastReq = generationRates.get(userId);
+            if (lastReq && Date.now() - lastReq < 60000) {
+                return res.status(429).json({ error: 'Please wait a minute before generating another challenge.' });
+            }
+            generationRates.set(userId, Date.now());
+        }
+
+        // Validate input
+        const validatedParams = generateChallengeSchema.parse(req.body);
+
+        // Generate challenge using prompt.txt specification
+        const generated = await generateChallengeFromSpec(validatedParams);
+
+        // Map difficulty string to numeric value for DB
+        const difficultyMap = {
+            'Beginner': 1,
+            'Easy': 2,
+            'Medium': 3,
+            'Hard': 4,
+            'Expert': 5,
+        };
+
+        // Save to DB with all fields
+        const challenge = await prisma.challenge.create({
+            data: {
+                title: generated.title,
+                description: generated.problem_statement,
+                difficulty: difficultyMap[generated.difficulty] || 1,
+                language: generated.language,
+                rubric: `Evaluate based on correctness, code quality, and efficiency. Expected complexity: ${generated.time_complexity}`,
+                difficultyExplanation: `This is a ${generated.difficulty} level ${generated.problem_style} challenge focusing on ${generated.topic}.`,
+                topic: generated.topic,
+                problemStyle: generated.problem_style,
+                inputFormat: generated.input_format,
+                outputFormat: generated.output_format,
+                constraints: JSON.stringify(generated.constraints),
+                examples: JSON.stringify(generated.examples),
+                starterCode: generated.starter_code,
+                referenceSolution: generated.reference_solution,
+                timeComplexity: generated.time_complexity,
+                spaceComplexity: generated.space_complexity,
+                edgeCases: JSON.stringify(generated.edge_cases),
+                hints: JSON.stringify(generated.hints),
+                testCases: JSON.stringify(generated.test_cases),
+            }
+        });
+
+        res.status(201).json(challenge);
+    } catch (err) {
+        if (err instanceof z.ZodError) {
+            return res.status(400).json({ error: 'Invalid input parameters', details: err.errors });
+        }
+        console.error('Generate advanced challenge error:', err);
         res.status(500).json({ error: 'Failed to generate challenge. Please try again.' });
     }
 });

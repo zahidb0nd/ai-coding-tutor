@@ -26,14 +26,30 @@ model User {
 }
 
 model Challenge {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String
+  id                    String       @id @default(auto()) @map("_id") @db.ObjectId
+  title                 String
+  description           String       // Maps to problem_statement from prompt.txt
   difficulty            Int
   language              String
   rubric                String
   difficultyExplanation String?
   createdBy             String?      @db.ObjectId
+  
+  // New fields from prompt.txt specification
+  topic                 String?
+  problemStyle          String?      // Algorithmic, Real-world, Debugging, Code Completion, Optimization
+  inputFormat           String?
+  outputFormat          String?
+  constraints           String?      // JSON array as string
+  examples              String?      // JSON array of {input, output, explanation}
+  starterCode           String?
+  referenceSolution     String?
+  timeComplexity        String?
+  spaceComplexity       String?
+  edgeCases             String?      // JSON array as string
+  hints                 String?      // JSON array as string
+  testCases             String?      // JSON array of {input, expected_output}
+  
   submissions           Submission[]
 }
 

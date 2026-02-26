@@ -35,6 +35,7 @@ export const loginUser = (data) => API.post('/api/auth/login', data);
 export const getChallenges = (params) => API.get('/api/challenges', { params });
 export const getChallenge = (id) => API.get(`/api/challenges/${id}`);
 export const generateChallenge = (data) => API.post('/api/challenges/generate', data);
+export const generateAdvancedChallenge = (data) => API.post('/api/challenges/generate-advanced', data);
 export const getHint = (id, data) => API.post(`/api/challenges/${id}/hint`, data);
 
 // Submissions
