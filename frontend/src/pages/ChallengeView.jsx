@@ -40,6 +40,26 @@ export default function ChallengeView() {
         fetchChallenge();
     }, [id]);
 
+    useEffect(() => {
+        let interval;
+        if (timerActive) {
+            interval = setInterval(() => {
+                const now = Date.now();
+                const delta = now - lastActiveRef.current;
+                lastActiveRef.current = now;
+                setElapsedMs(prev => prev + delta);
+            }, 100);
+        }
+        return () => clearInterval(interval);
+    }, [timerActive]);
+
+    const formatTime = (ms) => {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
     const fetchChallenge = async () => {
         setLoading(true);
         try {
