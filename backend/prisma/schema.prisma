@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String       @unique
+  passwordHash   String
+  level          Int          @default(1)
+  totalScore     Int          @default(0)
+  currentStreak  Int          @default(0)
+  fastestSolveTime Int?
+  lastActiveDate DateTime?
+  role           String       @default("student")
+  createdAt      DateTime     @default(now())
+  submissions    Submission[]
+}
+
+model Challenge {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  difficulty            Int
+  language              String
+  rubric                String
+  difficultyExplanation String?
+  createdBy             String?      @db.ObjectId
+  submissions           Submission[]
+}
+
+model Submission {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  challengeId String    @db.ObjectId
+  code        String
+  aiFeedback  String?
+  score       Int?
+  language    String    @default("javascript")
+  durationMs  Int?
+  hintsUsed   Int       @default(0)
+  submittedAt DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+}
