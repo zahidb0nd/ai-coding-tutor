@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { getChallenge, submitCode, getHint } from '../api';
 import CodeEditor from '../components/Editor';
@@ -24,7 +24,7 @@ export default function ChallengeView() {
     // Timer state
     const [timerActive, setTimerActive] = useState(false);
     const [elapsedMs, setElapsedMs] = useState(0);
-    const lastActiveRef = React.useRef(Date.now()); // Fallback if React isn't imported hook-wise
+    const lastActiveRef = useRef(Date.now());
 
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 
