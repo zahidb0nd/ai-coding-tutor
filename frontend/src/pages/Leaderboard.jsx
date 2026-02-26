@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getLeaderboard } from '../api';
+import { useIsMobile } from '../hooks/useMediaQuery';
 
 export default function Leaderboard() {
     const [users, setUsers] = useState([]);
@@ -7,6 +8,7 @@ export default function Leaderboard() {
     const [error, setError] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const isMobile = useIsMobile();
 
     const currentUser = JSON.parse(localStorage.getItem('user'));
 
@@ -38,8 +40,10 @@ export default function Leaderboard() {
     };
 
     return (
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
-            <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24, textAlign: 'center' }}>Top Coders</h1>
+        <div className="container" style={{ maxWidth: 900, padding: 'var(--space-8) var(--container-padding)' }}>
+            <h1 style={{ fontSize: isMobile ? 'var(--text-2xl)' : 'var(--text-3xl)', fontWeight: 700, marginBottom: 'var(--space-6)', textAlign: 'center' }}>
+                Top Coders
+            </h1>
 
             {error && (
                 <div style={{ color: 'var(--danger)', padding: 16, background: 'rgba(225, 112, 85, 0.1)', borderRadius: 8, marginBottom: 24, textAlign: 'center' }}>
@@ -47,11 +51,11 @@ export default function Leaderboard() {
                 </div>
             )}
 
-            <div style={{
-                background: 'var(--surface)',
-                borderRadius: 'var(--radius-lg)',
+            <div className={isMobile ? 'scroll-container' : ''} style={{
+                background: 'var(--bg-card)',
+                borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--border)',
-                overflow: 'hidden'
+                overflow: isMobile ? 'auto' : 'hidden'
             }}>
                 {loading ? (
                     <div style={{ padding: 32, textAlign: 'center' }}>
@@ -62,14 +66,14 @@ export default function Leaderboard() {
                         No rank data available yet. Start solving challenges!
                     </div>
                 ) : (
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? '500px' : 'auto' }}>
                         <thead>
                             <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(0,0,0,0.2)' }}>
-                                <th style={{ padding: '16px', textAlign: 'left', width: '80px' }}>Rank</th>
-                                <th style={{ padding: '16px', textAlign: 'left' }}>User</th>
-                                <th style={{ padding: '16px', textAlign: 'center' }}>Level</th>
-                                <th style={{ padding: '16px', textAlign: 'center' }}>Streak</th>
-                                <th style={{ padding: '16px', textAlign: 'right' }}>Score</th>
+                                <th style={{ padding: isMobile ? '12px' : '16px', textAlign: 'left', width: '80px', fontSize: isMobile ? '12px' : '14px' }}>Rank</th>
+                                <th style={{ padding: isMobile ? '12px' : '16px', textAlign: 'left', fontSize: isMobile ? '12px' : '14px' }}>User</th>
+                                <th style={{ padding: isMobile ? '12px' : '16px', textAlign: 'center', fontSize: isMobile ? '12px' : '14px' }}>Level</th>
+                                <th style={{ padding: isMobile ? '12px' : '16px', textAlign: 'center', fontSize: isMobile ? '12px' : '14px' }}>Streak</th>
+                                <th style={{ padding: isMobile ? '12px' : '16px', textAlign: 'right', fontSize: isMobile ? '12px' : '14px' }}>Score</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -105,21 +109,25 @@ export default function Leaderboard() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-4)', marginTop: 'var(--space-6)', flexWrap: 'wrap' }}>
                     <button
                         disabled={page === 1}
                         onClick={() => setPage(p => p - 1)}
-                        style={{ padding: '8px 16px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface)', cursor: page === 1 ? 'not-allowed' : 'pointer', opacity: page === 1 ? 0.5 : 1 }}
+                        className="btn btn-secondary"
+                        style={{ opacity: page === 1 ? 0.5 : 1 }}
                     >
-                        Previous
+                        {isMobile ? '←' : 'Previous'}
                     </button>
-                    <span style={{ display: 'flex', alignItems: 'center' }}>Page {page} of {totalPages}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', fontSize: isMobile ? 'var(--text-sm)' : 'var(--text-base)' }}>
+                        Page {page} of {totalPages}
+                    </span>
                     <button
                         disabled={page === totalPages}
                         onClick={() => setPage(p => p + 1)}
-                        style={{ padding: '8px 16px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface)', cursor: page === totalPages ? 'not-allowed' : 'pointer', opacity: page === totalPages ? 0.5 : 1 }}
+                        className="btn btn-secondary"
+                        style={{ opacity: page === totalPages ? 0.5 : 1 }}
                     >
-                        Next
+                        {isMobile ? '→' : 'Next'}
                     </button>
                 </div>
             )}

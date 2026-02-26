@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
-import Challenges from './pages/Challenges';
-import ChallengeView from './pages/ChallengeView';
+import Challenges from './pages/ChallengesResponsive';
+import ChallengeViewResponsive from './pages/ChallengeViewResponsive';
 import Dashboard from './pages/Dashboard';
 import Leaderboard from './pages/Leaderboard';
 import InstructorDashboard from './pages/InstructorDashboard';
@@ -32,7 +32,7 @@ export default function App() {
           path="/challenges/:id"
           element={
             <ProtectedRoute>
-              <ChallengeView />
+              <ChallengeViewResponsive />
             </ProtectedRoute>
           }
         />

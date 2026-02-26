@@ -11,12 +11,15 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 
+import { useIsMobile } from '../hooks/useMediaQuery';
+
 export default function Dashboard() {
     const [progress, setProgress] = useState(null);
     const [submissions, setSubmissions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -49,40 +52,27 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
+            <div className="container" style={{ padding: 'var(--space-8) var(--container-padding)' }}>
                 <div
                     className="loading-shimmer"
-                    style={{ height: 40, width: 300, borderRadius: 8, marginBottom: 32 }}
+                    style={{ height: 40, width: isMobile ? '100%' : 300, borderRadius: 8, marginBottom: 'var(--space-8)' }}
                 />
-                <div
-                    style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}
-                >
+                <div className="grid-responsive" style={{ marginBottom: 'var(--space-8)' }}>
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="loading-shimmer" style={{ height: 100, borderRadius: 12 }} />
+                        <div key={i} className="loading-shimmer" style={{ height: 100, borderRadius: 'var(--radius-md)' }} />
                     ))}
                 </div>
-                <div className="loading-shimmer" style={{ height: 300, borderRadius: 12 }} />
+                <div className="loading-shimmer" style={{ height: 300, borderRadius: 'var(--radius-md)' }} />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div style={{ textAlign: 'center', padding: 64, color: 'var(--text-muted)' }}>
-                <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+            <div style={{ textAlign: 'center', padding: 'var(--space-16)', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: 48, marginBottom: 'var(--space-4)' }}>⚠️</div>
                 <p>{error}</p>
-                <button
-                    onClick={fetchData}
-                    style={{
-                        marginTop: 16,
-                        padding: '8px 20px',
-                        borderRadius: 8,
-                        border: '1px solid var(--accent)',
-                        background: 'transparent',
-                        color: 'var(--accent)',
-                        cursor: 'pointer',
-                    }}
-                >
+                <button onClick={fetchData} className="btn btn-secondary" style={{ marginTop: 'var(--space-4)' }}>
                     Retry
                 </button>
             </div>
@@ -195,24 +185,9 @@ export default function Dashboard() {
             </div>
 
             {/* Stats Grid */}
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                    gap: 16,
-                    marginBottom: 32,
-                }}
-            >
+            <div className="grid-responsive" style={{ marginBottom: 'var(--space-8)' }}>
                 {statCards.map((card, idx) => (
-                    <div
-                        key={idx}
-                        style={{
-                            padding: 20,
-                            borderRadius: 'var(--radius-md)',
-                            background: 'var(--bg-card)',
-                            border: '1px solid var(--border)',
-                            transition: 'all 0.3s',
-                        }}
+                    <div key={idx} className="card" style={{ transition: 'all 0.3s' }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.borderColor = card.color + '66';
                             e.currentTarget.style.transform = 'translateY(-2px)';
@@ -222,11 +197,11 @@ export default function Dashboard() {
                             e.currentTarget.style.transform = 'translateY(0)';
                         }}
                     >
-                        <div style={{ fontSize: 28, marginBottom: 8 }}>{card.icon}</div>
-                        <div style={{ fontSize: 24, fontWeight: 700, color: card.color }}>
+                        <div style={{ fontSize: isMobile ? 24 : 28, marginBottom: 'var(--space-2)' }}>{card.icon}</div>
+                        <div style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: card.color }}>
                             {card.value}
                         </div>
-                        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+                        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 'var(--space-1)' }}>
                             {card.label}
                         </div>
                     </div>
@@ -235,19 +210,9 @@ export default function Dashboard() {
 
             {/* Score Chart */}
             {chartData.length > 0 && (
-                <div
-                    style={{
-                        padding: 24,
-                        borderRadius: 'var(--radius-md)',
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border)',
-                        marginBottom: 32,
-                    }}
-                >
-                    <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 20 }}>
-                        Score Progress
-                    </h2>
-                    <ResponsiveContainer width="100%" height={300}>
+                <div className="card" style={{ marginBottom: 'var(--space-8)' }}>
+                    <h2 className="card-header">Score Progress</h2>
+                    <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
                         <LineChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                             <XAxis

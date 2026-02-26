@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useIsMobile } from '../hooks/useMediaQuery';
+import MobileBottomNav from './MobileBottomNav';
 
 export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const isMobile = useIsMobile();
 
     const user = JSON.parse(localStorage.getItem('user') || 'null');
     const isLoggedIn = !!localStorage.getItem('token');
@@ -20,6 +23,11 @@ export default function Navbar() {
 
     if (!isLoggedIn) return null;
 
+    // Mobile uses bottom navigation
+    if (isMobile) {
+        return <MobileBottomNav />;
+    }
+
     const navItems = [
         { label: 'Challenges', path: '/challenges' },
         { label: 'Leaderboard', path: '/leaderboard' },
@@ -30,22 +38,21 @@ export default function Navbar() {
         navItems.push({ label: 'Instructor', path: '/instructor' });
     }
 
+    // Desktop navigation
     return (
         <nav
+            className="sticky-header desktop-only"
             style={{
-                position: 'sticky',
-                top: 0,
                 zIndex: 100,
                 background: 'rgba(10, 10, 15, 0.85)',
                 backdropFilter: 'blur(16px)',
                 borderBottom: '1px solid var(--border)',
-                padding: '0 24px',
+                padding: '0 var(--container-padding)',
             }}
         >
             <div
+                className="container"
                 style={{
-                    maxWidth: 1200,
-                    margin: '0 auto',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -84,7 +91,6 @@ export default function Navbar() {
                         alignItems: 'center',
                         gap: 8,
                     }}
-                    className="desktop-nav"
                 >
                     {navItems.map((item) => (
                         <Link
