@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { getSubmissionHistory } from '../api';
-import Editor from '@monaco-editor/react';
+import EditorSkeleton from '../components/EditorSkeleton';
+
+const Editor = lazy(() => import('@monaco-editor/react'));
 
 export default function CodeHistory() {
     const [history, setHistory] = useState([]);
@@ -106,18 +108,20 @@ export default function CodeHistory() {
                             </div>
                         </div>
                         <div style={{ flex: 1, position: 'relative' }}>
-                            <Editor
-                                height="100%"
-                                language={selectedSubmission.language || selectedSubmission.challenge.language}
-                                value={selectedSubmission.code}
-                                theme="vs-dark"
-                                options={{
-                                    readOnly: true,
-                                    minimap: { enabled: false },
-                                    fontSize: 14,
-                                    padding: { top: 16 }
-                                }}
-                            />
+                            <Suspense fallback={<EditorSkeleton />}>
+                                <Editor
+                                    height="100%"
+                                    language={selectedSubmission.language || selectedSubmission.challenge.language}
+                                    value={selectedSubmission.code}
+                                    theme="vs-dark"
+                                    options={{
+                                        readOnly: true,
+                                        minimap: { enabled: false },
+                                        fontSize: 14,
+                                        padding: { top: 16 }
+                                    }}
+                                />
+                            </Suspense>
                         </div>
                     </>
                 ) : null}

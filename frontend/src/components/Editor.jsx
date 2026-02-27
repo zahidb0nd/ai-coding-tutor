@@ -1,5 +1,8 @@
-import Editor from '@monaco-editor/react';
+import React, { Suspense, lazy } from 'react';
 import { useIsMobile } from '../hooks/useMediaQuery';
+import EditorSkeleton from './EditorSkeleton';
+
+const Editor = lazy(() => import('@monaco-editor/react'));
 
 export default function CodeEditor({ code, onChange, language = 'javascript' }) {
     const isMobile = useIsMobile();
@@ -66,14 +69,16 @@ export default function CodeEditor({ code, onChange, language = 'javascript' }) 
                 height: '100%',
             }}
         >
-            <Editor
-                height="100%"
-                language={language}
-                value={code}
-                onChange={(value) => onChange(value || '')}
-                theme="vs-dark"
-                options={isMobile ? mobileOptions : desktopOptions}
-            />
+            <Suspense fallback={<EditorSkeleton />}>
+                <Editor
+                    height="100%"
+                    language={language}
+                    value={code}
+                    onChange={(value) => onChange(value || '')}
+                    theme="vs-dark"
+                    options={isMobile ? mobileOptions : desktopOptions}
+                />
+            </Suspense>
         </div>
     );
 }

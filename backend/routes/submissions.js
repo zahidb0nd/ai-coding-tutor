@@ -2,7 +2,7 @@ const express = require('express');
 const { z } = require('zod');
 const prisma = require('../lib/prisma');
 const authMiddleware = require('../middleware/auth');
-const { getCodeFeedback } = require('../services/aiService');
+const { getCodeFeedback, getCodeFeedbackStream } = require('../services/aiService');
 
 const router = express.Router();
 
@@ -96,6 +96,112 @@ router.post('/', authMiddleware, async (req, res) => {
         }
         console.error('Create submission error:', err);
         res.status(500).json({ error: 'Failed to submit code. Please try again.' });
+    }
+});
+
+// POST /api/submissions/stream — submit code for AI feedback using Server-Sent Events
+router.post('/stream', authMiddleware, async (req, res) => {
+    try {
+        const { userId, challengeId, code, language, durationMs, timezoneOffset } = submissionSchema.parse(req.body);
+
+        // Verify user exists
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        // Verify challenge exists
+        const challenge = await prisma.challenge.findUnique({ where: { id: challengeId } });
+        if (!challenge) {
+            return res.status(404).json({ error: 'Challenge not found.' });
+        }
+
+        // Setup Server-Sent Events (SSE) Headers
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+
+        // Start Streaming from Groq
+        const stream = await getCodeFeedbackStream(code, challenge.description, challenge.rubric);
+
+        let fullResponse = "";
+
+        // Pipe chunks immediately
+        for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            fullResponse += content;
+            res.write(`data: ${JSON.stringify({ content })}\n\n`);
+        }
+
+        // Parse fullResponse to save submission and calculate score
+        let feedback;
+        try {
+            feedback = JSON.parse(fullResponse);
+        } catch (e) {
+            console.error('Failed to parse final streamed JSON feedback:', e.message);
+            feedback = {
+                score: 0,
+                summary: 'AI evaluation stream finished but produced invalid feedback format. Please try again.',
+                line_comments: [],
+                next_steps: ['Check if code syntax is fundamentally broken or resubmit.']
+            };
+        }
+
+        const score = feedback.score || 0;
+
+        // Save submission
+        const submission = await prisma.submission.create({
+            data: {
+                userId,
+                challengeId,
+                code,
+                language,
+                durationMs,
+                aiFeedback: JSON.stringify(feedback),
+                score,
+            },
+        });
+
+        // Compute streak safely
+        const now = new Date();
+        const { calculateStreak } = require('../lib/streak');
+        let currentStreak = user.currentStreak || 0;
+        if (score > 0) {
+            currentStreak = calculateStreak(currentStreak, user.lastActiveDate ? new Date(user.lastActiveDate) : null, now, timezoneOffset);
+        }
+
+        // Update fastest solve time
+        let newFastestTime = user.fastestSolveTime;
+        if (score > 0 && durationMs) {
+            if (!newFastestTime || durationMs < newFastestTime) {
+                newFastestTime = durationMs;
+            }
+        }
+
+        // Update user stats
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                totalScore: { increment: score },
+                currentStreak,
+                lastActiveDate: score > 0 ? now : user.lastActiveDate,
+                fastestSolveTime: newFastestTime
+            }
+        });
+
+        // Auto-difficulty scaling
+        await checkAndScaleLevel(userId, user.level);
+
+        res.write(`data: ${JSON.stringify({ done: true, feedback, submission: { id: submission.id, score, submittedAt: submission.submittedAt } })}\n\n`);
+        res.end();
+    } catch (err) {
+        if (err.issues) {
+            res.write(`data: ${JSON.stringify({ error: err.issues[0].message })}\n\n`);
+        } else {
+            console.error('Create stream submission error:', err);
+            res.write(`data: ${JSON.stringify({ error: err.message || 'Failed to submit code stream' })}\n\n`);
+        }
+        res.end();
     }
 });
 

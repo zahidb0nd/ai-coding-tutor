@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { getChallenge, submitCode, getHint } from '../api';
+import { getChallenge, getHint } from '../api';
+import { useStreamingEvaluation } from '../hooks/useStreamingEvaluation';
 import CodeEditor from '../components/Editor';
 import FeedbackPanel from '../components/FeedbackPanel';
 import AITutorPanel from '../components/AITutorPanel';
 import { SUPPORTED_LANGUAGES, LANGUAGE_TEMPLATES } from '../utils/languages';
+import html2canvas from 'html2canvas';
 
 export default function ChallengeView() {
     const { id } = useParams();
@@ -13,14 +15,20 @@ export default function ChallengeView() {
     const [code, setCode] = useState(LANGUAGE_TEMPLATES['javascript']);
     const [feedback, setFeedback] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
+
+    // New streaming hook
+    const { streamedResponse, finalResult, isStreaming, error: streamError, evaluateStream } = useStreamingEvaluation();
 
     const [hintText, setHintText] = useState(null);
     const [requestingHint, setRequestingHint] = useState(false);
     const [hintError, setHintError] = useState('');
     const [hintCooldown, setHintCooldown] = useState(0);
     const [activeTab, setActiveTab] = useState('tutor'); // 'tutor' | 'feedback'
+
+    // Image capture state and ref
+    const captureRef = useRef(null);
+    const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
     // Timer state
     const [timerActive, setTimerActive] = useState(false);
@@ -40,6 +48,25 @@ export default function ChallengeView() {
     useEffect(() => {
         fetchChallenge();
     }, [id]);
+
+    useEffect(() => {
+        if (finalResult && finalResult.feedback) {
+            setFeedback(finalResult.feedback);
+            // Don't resume timer if they solved it successfully
+            if (finalResult.feedback.score < 70) {
+                lastActiveRef.current = Date.now();
+                setTimerActive(true);
+            }
+        }
+    }, [finalResult]);
+
+    useEffect(() => {
+        if (streamError) {
+            setError(streamError);
+            lastActiveRef.current = Date.now();
+            setTimerActive(true);
+        }
+    }, [streamError]);
 
     useEffect(() => {
         let interval;
@@ -86,34 +113,19 @@ export default function ChallengeView() {
             return;
         }
 
-        setSubmitting(true);
         setTimerActive(false);
         setError('');
         setFeedback(null);
         setActiveTab('feedback'); // Auto-switch to feedback tab on submit
 
-        try {
-            const res = await submitCode({
-                userId: user.id,
-                challengeId: id,
-                code,
-                language,
-                durationMs: elapsedMs,
-                timezoneOffset: new Date().getTimezoneOffset()
-            });
-            setFeedback(res.data.feedback);
-            // Don't resume timer if they solved it successfully
-            if (res.data.feedback?.score < 70) {
-                lastActiveRef.current = Date.now();
-                setTimerActive(true);
-            }
-        } catch (err) {
-            setError(err.response?.data?.error || 'Failed to get feedback. Please try again.');
-            lastActiveRef.current = Date.now();
-            setTimerActive(true); // Resume timer on error
-        } finally {
-            setSubmitting(false);
-        }
+        await evaluateStream({
+            userId: user.id,
+            challengeId: id,
+            code,
+            language,
+            durationMs: elapsedMs,
+            timezoneOffset: new Date().getTimezoneOffset()
+        }, localStorage.getItem('token'));
     };
 
     const handleGetHint = async (level) => {
@@ -130,6 +142,50 @@ export default function ChallengeView() {
             }
         } finally {
             setRequestingHint(false);
+        }
+    };
+
+    const handleDownloadImage = async () => {
+        if (!captureRef.current) return;
+        setIsGeneratingImage(true);
+
+        try {
+            const canvas = await html2canvas(captureRef.current, {
+                backgroundColor: '#1e1e2e',
+                scale: 2,
+                logging: false,
+                useCORS: true,
+            });
+
+            const finalCanvas = document.createElement('canvas');
+            const ctx = finalCanvas.getContext('2d');
+
+            const padding = 40;
+            const watermarkHeight = 60;
+
+            finalCanvas.width = canvas.width + padding * 2;
+            finalCanvas.height = canvas.height + padding * 2 + watermarkHeight;
+
+            ctx.fillStyle = '#0f0f13';
+            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+            ctx.drawImage(canvas, padding, padding);
+
+            ctx.font = 'bold 24px monospace';
+            ctx.fillStyle = '#a29bfe';
+            ctx.textAlign = 'right';
+            ctx.fillText('✨ CodeTutor Solution by You', finalCanvas.width - padding, finalCanvas.height - padding / 2);
+
+            const dataUrl = finalCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `codetutor-solution-${challenge?.title?.replace(/\\s+/g, '-').toLowerCase() || 'code'}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (error) {
+            console.error('Failed to generate image', error);
+            setError('Failed to generate solution image.');
+        } finally {
+            setIsGeneratingImage(false);
         }
     };
 
@@ -240,36 +296,64 @@ export default function ChallengeView() {
                         ⏱ {formatTime(elapsedMs)}
                     </div>
                 </div>
-                <button
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                    style={{
-                        padding: '8px 24px',
-                        borderRadius: 'var(--radius-sm)',
-                        border: 'none',
-                        background: submitting
-                            ? 'var(--border-light)'
-                            : 'linear-gradient(135deg, #6c5ce7, #a29bfe)',
-                        color: '#fff',
-                        fontSize: 14,
-                        fontWeight: 600,
-                        cursor: submitting ? 'not-allowed' : 'pointer',
-                        transition: 'all 0.3s',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        boxShadow: submitting ? 'none' : '0 4px 16px var(--accent-glow)',
-                    }}
-                >
-                    {submitting ? (
-                        <>
-                            <span className="spinner" style={{ width: 16, height: 16 }} />
-                            Analyzing...
-                        </>
-                    ) : (
-                        <>🚀 Get Feedback</>
+                <div style={{ display: 'flex', gap: 12 }}>
+                    {feedback && feedback.score === 100 && (
+                        <button
+                            onClick={handleDownloadImage}
+                            disabled={isGeneratingImage || isStreaming}
+                            style={{
+                                padding: '8px 16px',
+                                borderRadius: 'var(--radius-sm)',
+                                border: '1px solid var(--accent)',
+                                background: 'transparent',
+                                color: 'var(--accent)',
+                                fontSize: 14,
+                                fontWeight: 600,
+                                cursor: (isGeneratingImage || isStreaming) ? 'not-allowed' : 'pointer',
+                                transition: 'all 0.3s',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8,
+                            }}
+                        >
+                            {isGeneratingImage ? (
+                                <><span className="spinner" style={{ width: 14, height: 14, borderColor: 'var(--accent)', borderTopColor: 'transparent', borderRightColor: 'transparent' }} /> Capturing...</>
+                            ) : (
+                                <>📸 Share Solution</>
+                            )}
+                        </button>
                     )}
-                </button>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isStreaming}
+                        style={{
+                            padding: '8px 24px',
+                            borderRadius: 'var(--radius-sm)',
+                            border: 'none',
+                            background: isStreaming
+                                ? 'var(--border-light)'
+                                : 'linear-gradient(135deg, #6c5ce7, #a29bfe)',
+                            color: '#fff',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            cursor: isStreaming ? 'not-allowed' : 'pointer',
+                            transition: 'all 0.3s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            boxShadow: isStreaming ? 'none' : '0 4px 16px var(--accent-glow)',
+                        }}
+                    >
+                        {isStreaming ? (
+                            <>
+                                <span className="spinner" style={{ width: 16, height: 16 }} />
+                                Analyzing...
+                            </>
+                        ) : (
+                            <>🚀 Get Feedback</>
+                        )}
+                    </button>
+                </div>
             </div>
 
             {/* Error bar */}
@@ -289,6 +373,7 @@ export default function ChallengeView() {
 
             {/* Main split view */}
             <div
+                ref={captureRef}
                 style={{
                     flex: 1,
                     display: 'flex',
@@ -398,7 +483,7 @@ export default function ChallengeView() {
                                 loading={requestingHint}
                             />
                         ) : (
-                            <FeedbackPanel feedback={feedback} loading={submitting} />
+                            <FeedbackPanel feedback={feedback} isStreaming={isStreaming} streamedResponse={streamedResponse} />
                         )}
                     </div>
                 </div>

@@ -67,6 +67,39 @@ Respond ONLY with valid JSON, no explanation outside the JSON:
 }
 
 /**
+ * Get AI feedback as an AsyncGenerator stream
+ */
+async function getCodeFeedbackStream(code, challengeDescription, rubric) {
+    const prompt = `You are a coding tutor reviewing a student's code.
+
+Challenge: ${challengeDescription}
+Rubric: ${rubric}
+Student code:
+${code}
+
+If the submitted language is C, explicitly evaluate the code for proper memory management, pointer usage, and standard C library imports.
+
+Respond ONLY with valid JSON, no explanation outside the JSON:
+{
+  "score": 0-100,
+  "summary": "brief overall feedback",
+  "line_comments": [
+    { "line": 5, "comment": "explanation of issue on this line" }
+  ],
+  "next_steps": ["tip 1", "tip 2"]
+}`;
+
+    // Note: Llama 3 models on Groq natively support stream
+    return await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        stream: true,
+        temperature: 0.3,
+        max_tokens: 2048,
+    });
+}
+
+/**
  * Generate a new challenge using AI based on prompt.txt specification
  * @param {Object} params - Generation parameters
  * @param {string} params.language - Programming language (C, C++, Java, JavaScript, Python)
@@ -302,4 +335,4 @@ Act like a friendly, supportive peer. KEEP IT CONCISE. Only respond with valid J
     }
 }
 
-module.exports = { getCodeFeedback, generateChallenge, generateChallengeFromSpec, getHint };
+module.exports = { getCodeFeedback, getCodeFeedbackStream, generateChallenge, generateChallengeFromSpec, getHint };

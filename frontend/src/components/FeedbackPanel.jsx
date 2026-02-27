@@ -1,5 +1,5 @@
-export default function FeedbackPanel({ feedback, loading }) {
-    if (loading) {
+export default function FeedbackPanel({ feedback, isStreaming, streamedResponse }) {
+    if (isStreaming) {
         return (
             <div style={{ padding: 24 }}>
                 <div
@@ -27,6 +27,24 @@ export default function FeedbackPanel({ feedback, loading }) {
                         }}
                     />
                 ))}
+
+                {/* Display the raw JSON stream as it types out */}
+                {streamedResponse && (
+                    <div style={{
+                        marginTop: 24,
+                        padding: 16,
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius-md)',
+                        fontFamily: 'monospace',
+                        color: 'var(--text-secondary)',
+                        fontSize: 13,
+                        whiteSpace: 'pre-wrap',
+                        overflowX: 'auto'
+                    }}>
+                        {streamedResponse}
+                    </div>
+                )}
             </div>
         );
     }
@@ -87,10 +105,10 @@ export default function FeedbackPanel({ feedback, loading }) {
                                     ? 'var(--warning)'
                                     : 'var(--danger)',
                         border: `2px solid ${feedback.score >= 70
-                                ? 'var(--success)'
-                                : feedback.score >= 40
-                                    ? 'var(--warning)'
-                                    : 'var(--danger)'
+                            ? 'var(--success)'
+                            : feedback.score >= 40
+                                ? 'var(--warning)'
+                                : 'var(--danger)'
                             }`,
                     }}
                 >
