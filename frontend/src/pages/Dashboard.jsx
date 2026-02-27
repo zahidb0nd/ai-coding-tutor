@@ -158,6 +158,7 @@ export default function Dashboard() {
                         borderRadius: 'var(--radius-md)',
                         background: 'var(--bg-card)',
                         border: '1px solid var(--border)',
+                        boxShadow: 'var(--shadow-sm)',
                     }}
                 >
                     <div
@@ -187,14 +188,14 @@ export default function Dashboard() {
             {/* Stats Grid */}
             <div className="grid-responsive" style={{ marginBottom: 'var(--space-8)' }}>
                 {statCards.map((card, idx) => (
-                    <div key={idx} className="card" style={{ transition: 'all 0.3s' }}
+                    <div key={idx} className="card" style={{ transition: 'all 0.3s', boxShadow: 'var(--shadow-sm)' }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.borderColor = card.color + '66';
-                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.borderColor = 'var(--border)';
-                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
                         }}
                     >
                         <div style={{ fontSize: isMobile ? 24 : 28, marginBottom: 'var(--space-2)' }}>{card.icon}</div>
@@ -210,7 +211,7 @@ export default function Dashboard() {
 
             {/* Score Chart */}
             {chartData.length > 0 && (
-                <div className="card" style={{ marginBottom: 'var(--space-8)' }}>
+                <div className="card" style={{ marginBottom: 'var(--space-8)', boxShadow: 'var(--shadow-sm)' }}>
                     <h2 className="card-header">Score Progress</h2>
                     <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
                         <LineChart data={chartData}>
@@ -257,6 +258,7 @@ export default function Dashboard() {
                     borderRadius: 'var(--radius-md)',
                     background: 'var(--bg-card)',
                     border: '1px solid var(--border)',
+                    boxShadow: 'var(--shadow-sm)',
                     overflow: 'hidden',
                 }}
             >

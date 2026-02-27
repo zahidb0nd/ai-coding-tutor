@@ -18,18 +18,17 @@ export default function ChallengeCard({ challenge }) {
                 transition: 'all 0.3s ease',
                 position: 'relative',
                 overflow: 'hidden',
+                boxShadow: 'var(--shadow-sm)',
             }}
             onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'var(--bg-card-hover)';
                 e.currentTarget.style.borderColor = 'var(--accent)';
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 8px 32px rgba(108, 92, 231, 0.15)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
             }}
             onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'var(--bg-card)';
                 e.currentTarget.style.borderColor = 'var(--border)';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
             }}
         >
             {/* Difficulty badge */}

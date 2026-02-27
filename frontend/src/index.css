@@ -1,37 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "./styles/mobile-first.css";
 
 /* ===== Design Tokens ===== */
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 
-  /* Dark theme palette */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-card: #1a1a2e;
-  --bg-card-hover: #22223a;
-  --bg-input: #16161f;
+  /* Light minimal theme palette */
+  --bg-primary: #f8fafc; /* Very light slate background */
+  --bg-secondary: #f1f5f9; /* Slightly darker slate for contrast */
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-input: #ffffff;
 
-  --text-primary: #f0f0f5;
-  --text-secondary: #a0a0b8;
-  --text-muted: #6b6b80;
+  --text-primary: #0f172a; /* Dark slate */
+  --text-secondary: #475569; /* Slate 600 */
+  --text-muted: #64748b; /* Slate 500 */
 
-  --accent: #6c5ce7;
-  --accent-hover: #7c6df7;
-  --accent-glow: rgba(108, 92, 231, 0.3);
+  --accent: #0891b2; /* Cyan Primary */
+  --accent-hover: #06b6d4; /* Cyan Secondary */
+  --accent-glow: rgba(8, 145, 178, 0.15);
 
-  --success: #00b894;
-  --warning: #fdcb6e;
-  --danger: #e17055;
+  --success: #22c55e; /* Green CTA */
+  --warning: #f59e0b; /* Amber */
+  --danger: #ef4444; /* Red */
 
-  --border: #2a2a3e;
-  --border-light: #3a3a52;
+  --border: #e2e8f0; /* Slate 200 */
+  --border-light: #cbd5e1; /* Slate 300 */
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
 }
 
 /* ===== Base Reset ===== */
@@ -84,17 +89,18 @@ body {
 
 /* ===== Utility classes ===== */
 .glass {
-  background: rgba(26, 26, 46, 0.6);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .glow-accent {
-  box-shadow: 0 0 20px var(--accent-glow), 0 0 60px rgba(108, 92, 231, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--accent) 0%, #a29bfe 50%, #74b9ff 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -114,14 +120,13 @@ body {
 }
 
 @keyframes pulse-glow {
-
   0%,
   100% {
-    box-shadow: 0 0 20px var(--accent-glow);
+    box-shadow: var(--shadow-md);
   }
 
   50% {
-    box-shadow: 0 0 40px var(--accent-glow), 0 0 80px rgba(108, 92, 231, 0.15);
+    box-shadow: var(--shadow-lg);
   }
 }
 

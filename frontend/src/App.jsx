@@ -10,7 +10,13 @@ import CodeHistory from './pages/CodeHistory';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
-  if (!token) return <Navigate to="/" replace />;
+  if (!token || token === 'undefined' || token === 'null') return <Navigate to="/" replace />;
+  return children;
+}
+
+function PublicRoute({ children }) {
+  const token = localStorage.getItem('token');
+  if (token && token !== 'undefined' && token !== 'null') return <Navigate to="/challenges" replace />;
   return children;
 }
 
@@ -19,7 +25,7 @@ export default function App() {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
         <Route
           path="/challenges"
           element={

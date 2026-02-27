@@ -47,31 +47,7 @@ export default function Login() {
                 overflow: 'hidden',
             }}
         >
-            {/* Background decoration */}
-            <div
-                style={{
-                    position: 'absolute',
-                    width: 500,
-                    height: 500,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(108,92,231,0.15) 0%, transparent 70%)',
-                    top: '-10%',
-                    right: '-10%',
-                    pointerEvents: 'none',
-                }}
-            />
-            <div
-                style={{
-                    position: 'absolute',
-                    width: 400,
-                    height: 400,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(162,155,254,0.1) 0%, transparent 70%)',
-                    bottom: '-5%',
-                    left: '-5%',
-                    pointerEvents: 'none',
-                }}
-            />
+            {/* Removed dark mode background decorations */}
 
             <div
                 className="animate-fade-in"
@@ -90,9 +66,7 @@ export default function Login() {
                             fontSize: 32,
                             fontWeight: 800,
                             marginBottom: 8,
-                            background: 'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 50%, #74b9ff 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
+                            color: 'var(--text-primary)',
                         }}
                     >
                         CodeTutor
@@ -109,6 +83,7 @@ export default function Login() {
                         border: '1px solid var(--border)',
                         borderRadius: 'var(--radius-lg)',
                         padding: 32,
+                        boxShadow: 'var(--shadow-md)',
                     }}
                 >
                     {/* Tabs */}
@@ -250,13 +225,13 @@ export default function Login() {
                                 border: 'none',
                                 background: loading
                                     ? 'var(--border-light)'
-                                    : 'linear-gradient(135deg, #6c5ce7, #a29bfe)',
+                                    : 'var(--accent)',
                                 color: '#fff',
                                 fontSize: 15,
                                 fontWeight: 600,
                                 cursor: loading ? 'not-allowed' : 'pointer',
                                 transition: 'all 0.3s',
-                                boxShadow: loading ? 'none' : '0 4px 20px var(--accent-glow)',
+                                boxShadow: loading ? 'none' : 'var(--shadow-sm)',
                             }}
                         >
                             {loading

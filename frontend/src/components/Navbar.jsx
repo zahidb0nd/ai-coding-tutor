@@ -9,8 +9,18 @@ export default function Navbar() {
     const location = useLocation();
     const isMobile = useIsMobile();
 
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
-    const isLoggedIn = !!localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    const isLoggedIn = token && token !== 'undefined' && token !== 'null';
+
+    let user = null;
+    try {
+        const userStr = localStorage.getItem('user');
+        if (userStr && userStr !== 'undefined' && userStr !== 'null') {
+            user = JSON.parse(userStr);
+        }
+    } catch (e) {
+        console.error('Failed to parse user', e);
+    }
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -44,8 +54,8 @@ export default function Navbar() {
             className="sticky-header desktop-only"
             style={{
                 zIndex: 100,
-                background: 'rgba(10, 10, 15, 0.85)',
-                backdropFilter: 'blur(16px)',
+                background: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(8px)',
                 borderBottom: '1px solid var(--border)',
                 padding: '0 var(--container-padding)',
             }}
@@ -75,9 +85,7 @@ export default function Navbar() {
                         style={{
                             fontSize: 18,
                             fontWeight: 700,
-                            background: 'linear-gradient(135deg, #6c5ce7, #a29bfe)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
+                            color: 'var(--accent)',
                         }}
                     >
                         CodeTutor
@@ -128,7 +136,7 @@ export default function Navbar() {
                                     borderRadius: 20,
                                     fontSize: 12,
                                     fontWeight: 600,
-                                    background: `${levelColors[user.level] || levelColors[1]}22`,
+                                    background: `${levelColors[user.level] || levelColors[1]}15`,
                                     color: levelColors[user.level] || levelColors[1],
                                     border: `1px solid ${levelColors[user.level] || levelColors[1]}44`,
                                 }}
