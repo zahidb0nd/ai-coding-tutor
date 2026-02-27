@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getChallenge, submitCode, getHint } from '../api';
 import CodeEditor from '../components/Editor';
 import FeedbackPanel from '../components/FeedbackPanel';
+import AITutorPanel from '../components/AITutorPanel';
 import { SUPPORTED_LANGUAGES, LANGUAGE_TEMPLATES } from '../utils/languages';
 
 export default function ChallengeView() {
@@ -15,11 +16,11 @@ export default function ChallengeView() {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
-    // Hint state
-    const [hintText, setHintText] = useState('');
+    const [hintText, setHintText] = useState(null);
     const [requestingHint, setRequestingHint] = useState(false);
     const [hintError, setHintError] = useState('');
     const [hintCooldown, setHintCooldown] = useState(0);
+    const [activeTab, setActiveTab] = useState('tutor'); // 'tutor' | 'feedback'
 
     // Timer state
     const [timerActive, setTimerActive] = useState(false);
@@ -89,6 +90,7 @@ export default function ChallengeView() {
         setTimerActive(false);
         setError('');
         setFeedback(null);
+        setActiveTab('feedback'); // Auto-switch to feedback tab on submit
 
         try {
             const res = await submitCode({
@@ -114,13 +116,13 @@ export default function ChallengeView() {
         }
     };
 
-    const handleGetHint = async () => {
+    const handleGetHint = async (level) => {
         setRequestingHint(true);
         setHintError('');
         try {
-            const res = await getHint(id, { code });
-            setHintText(res.data.hint);
-            setHintCooldown(30); // 30 seconds cooldown
+            const res = await getHint(id, { code, level });
+            setHintText(res.data);
+            setHintCooldown(10); // 10 seconds cooldown
         } catch (err) {
             setHintError(err.response?.data?.error || 'Failed to get a hint.');
             if (err.response?.status === 429) {
@@ -366,67 +368,38 @@ export default function ChallengeView() {
                             </div>
                         )}
 
-                        {/* Hint Section */}
-                        <div style={{ marginTop: 24 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                                <button
-                                    onClick={handleGetHint}
-                                    disabled={requestingHint || hintCooldown > 0}
-                                    style={{
-                                        background: 'rgba(108, 92, 231, 0.1)',
-                                        color: 'var(--accent)',
-                                        border: '1px solid var(--accent)',
-                                        padding: '6px 14px',
-                                        borderRadius: '20px',
-                                        fontSize: '13px',
-                                        fontWeight: 600,
-                                        cursor: (requestingHint || hintCooldown > 0) ? 'not-allowed' : 'pointer',
-                                        opacity: (requestingHint || hintCooldown > 0) ? 0.6 : 1,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        transition: 'all 0.2s'
-                                    }}
-                                >
-                                    {requestingHint ? (
-                                        <>
-                                            <span className="spinner" style={{ width: 12, height: 12, border: '2px solid rgba(108, 92, 231, 0.3)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                                            Thinking...
-                                        </>
-                                    ) : hintCooldown > 0 ? (
-                                        <>⏳ Wait {hintCooldown}s</>
-                                    ) : (
-                                        <>💡 Give me a hint</>
-                                    )}
-                                </button>
-                            </div>
-
-                            {hintError && (
-                                <div style={{ color: 'var(--danger)', fontSize: 13, marginBottom: 12 }}>
-                                    {hintError}
-                                </div>
-                            )}
-
-                            {hintText && (
-                                <div style={{
-                                    padding: '12px 16px',
-                                    background: 'rgba(253, 203, 110, 0.1)',
-                                    border: '1px solid rgba(253, 203, 110, 0.3)',
-                                    borderRadius: '8px',
-                                    color: 'var(--text-primary)',
-                                    fontSize: 14,
-                                    lineHeight: 1.6,
-                                    animation: 'fadeIn 0.3s ease-out'
-                                }}>
-                                    <strong>Hint: </strong> {hintText}
-                                </div>
-                            )}
-                        </div>
+                        {/* Hint Section Removed from Description panel. Handled by AITutorPanel */}
                     </div>
 
-                    {/* Feedback */}
-                    <div style={{ flex: 1, overflowY: 'auto' }}>
-                        <FeedbackPanel feedback={feedback} loading={submitting} />
+                    {/* Tabs */}
+                    <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: 'var(--bg-card)' }}>
+                        <button
+                            onClick={() => setActiveTab('tutor')}
+                            style={{ flex: 1, padding: '12px', background: 'none', border: 'none', borderBottom: activeTab === 'tutor' ? '2px solid var(--accent)' : '2px solid transparent', color: activeTab === 'tutor' ? 'var(--accent)' : 'var(--text-muted)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                        >
+                            🤖 AI Tutor
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('feedback')}
+                            style={{ flex: 1, padding: '12px', background: 'none', border: 'none', borderBottom: activeTab === 'feedback' ? '2px solid var(--accent)' : '2px solid transparent', color: activeTab === 'feedback' ? 'var(--accent)' : 'var(--text-muted)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                        >
+                            📝 Feedback {feedback && (feedback.score >= 70 ? '✅' : feedback.score >= 40 ? '⚠️' : '❌')}
+                        </button>
+                    </div>
+
+                    {/* Tab Content */}
+                    <div style={{ flex: 1, overflowY: activeTab === 'tutor' ? 'hidden' : 'auto' }}>
+                        {activeTab === 'tutor' ? (
+                            <AITutorPanel
+                                code={code}
+                                challenge={challenge}
+                                onGetHint={handleGetHint}
+                                hintResponse={hintText}
+                                loading={requestingHint}
+                            />
+                        ) : (
+                            <FeedbackPanel feedback={feedback} loading={submitting} />
+                        )}
                     </div>
                 </div>
             </div>

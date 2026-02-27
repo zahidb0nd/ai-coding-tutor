@@ -203,7 +203,7 @@ router.post('/:id/hint', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user?.id;
-        const { code } = req.body;
+        const { code, level } = req.body;
 
         // Rate limit: 1 hint per 30 seconds per user per challenge
         if (userId) {
@@ -220,7 +220,7 @@ router.post('/:id/hint', authMiddleware, async (req, res) => {
             return res.status(404).json({ error: 'Challenge not found.' });
         }
 
-        const hintRes = await getHint(code, challenge.description);
+        const hintRes = await getHint(code, challenge.description, level);
 
         res.json(hintRes);
     } catch (err) {

@@ -4,6 +4,7 @@ import { getChallenge, submitCode, getHint } from '../api';
 import CodeEditor from '../components/Editor';
 import FeedbackPanel from '../components/FeedbackPanel';
 import MobileSheet from '../components/MobileSheet';
+import AITutorPanel from '../components/AITutorPanel';
 import { SUPPORTED_LANGUAGES, LANGUAGE_TEMPLATES } from '../utils/languages';
 
 /**
@@ -21,11 +22,13 @@ export default function ChallengeViewMobile() {
     const [error, setError] = useState('');
 
     // Mobile-specific state
+    // Mobile-specific state
     const [showDescription, setShowDescription] = useState(true);
     const [showFeedback, setShowFeedback] = useState(false);
+    const [showTutor, setShowTutor] = useState(false);
 
     // Hint state
-    const [hintText, setHintText] = useState('');
+    const [hintText, setHintText] = useState(null);
     const [requestingHint, setRequestingHint] = useState(false);
     const [hintError, setHintError] = useState('');
     const [hintCooldown, setHintCooldown] = useState(0);
@@ -116,19 +119,15 @@ export default function ChallengeViewMobile() {
         }
     };
 
-    const handleGetHint = async () => {
-        if (!code.trim()) {
-            setHintError('Write some code first to get a contextual hint.');
-            return;
-        }
-
+    const handleGetHint = async (level) => {
+        // We removed the strict empty code check from here because AI Tutor handles it
         setRequestingHint(true);
         setHintError('');
 
         try {
-            const res = await getHint(id, { code });
-            setHintText(res.data.hint);
-            setHintCooldown(30);
+            const res = await getHint(id, { code, level });
+            setHintText(res.data);
+            setHintCooldown(10);
         } catch (err) {
             setHintError(err.response?.data?.error || 'Failed to get hint.');
         } finally {
@@ -245,38 +244,21 @@ export default function ChallengeViewMobile() {
                             </div>
                         )}
 
-                        {/* Hint button */}
+                        {/* AI Tutor button */}
                         <button
-                            onClick={handleGetHint}
-                            disabled={requestingHint || hintCooldown > 0}
+                            onClick={() => setShowTutor(true)}
                             className="btn btn-secondary btn-sm"
                             style={{
                                 background: 'rgba(108, 92, 231, 0.1)',
                                 color: 'var(--accent)',
                                 border: '1px solid var(--accent)',
-                                opacity: (requestingHint || hintCooldown > 0) ? 0.6 : 1,
+                                width: '100%',
+                                justifyContent: 'center',
+                                marginTop: 12
                             }}
                         >
-                            {requestingHint ? '💭 Thinking...' : hintCooldown > 0 ? `⏳ Wait ${hintCooldown}s` : '💡 Get a Hint'}
+                            🤖 Open AI Tutor
                         </button>
-
-                        {hintError && (
-                            <div style={{ color: 'var(--danger)', fontSize: 13 }}>{hintError}</div>
-                        )}
-
-                        {hintText && (
-                            <div style={{
-                                padding: 'var(--space-3)',
-                                background: 'rgba(253, 203, 110, 0.1)',
-                                border: '1px solid rgba(253, 203, 110, 0.3)',
-                                borderRadius: 'var(--radius-sm)',
-                                color: 'var(--text-primary)',
-                                fontSize: 13,
-                                lineHeight: 1.6,
-                            }}>
-                                <strong>Hint: </strong>{hintText}
-                            </div>
-                        )}
                     </div>
                 )}
             </div>
@@ -340,6 +322,21 @@ export default function ChallengeViewMobile() {
                 title="AI Feedback"
             >
                 <FeedbackPanel feedback={feedback} loading={submitting} />
+            </MobileSheet>
+
+            {/* AI Tutor Modal */}
+            <MobileSheet
+                isOpen={showTutor}
+                onClose={() => setShowTutor(false)}
+                title="AI Tutor"
+            >
+                <AITutorPanel
+                    code={code}
+                    challenge={challenge}
+                    onGetHint={handleGetHint}
+                    hintResponse={hintText}
+                    loading={requestingHint}
+                />
             </MobileSheet>
         </div>
     );

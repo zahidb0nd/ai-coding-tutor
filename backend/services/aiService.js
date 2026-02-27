@@ -244,18 +244,44 @@ async function generateChallenge(level, language, recentTopics) {
  * Get a hint for the user's current attempt
  * @param {string} code - User's current code
  * @param {string} challengeDescription - The challenge description
+ * @param {number} level - The hint level (1: Conceptual, 2: Logic Breakdown, 3: Edge Cases, 4: Code Snippet)
  * @returns {Object} { hint }
  */
-async function getHint(code, challengeDescription) {
-    const prompt = `You are a coding tutor. The student is stuck on this challenge:
+async function getHint(code, challengeDescription, level = 1) {
+    let hintInstruction = "";
+
+    if (!code || code.trim() === "") {
+        return { hint: "Just start typing, I'm here to catch you." };
+    }
+
+    switch (Number(level)) {
+        case 1:
+            hintInstruction = "Discuss the theory and high-level approach needed to solve the problem. Do not provide any code or step-by-step logic.";
+            break;
+        case 2:
+            hintInstruction = "Provide a step-by-step logic list of how to solve the problem. Do not write any actual code.";
+            break;
+        case 3:
+            hintInstruction = "Point out specifically where the user's current code might fail, focusing on edge cases like empty arrays, null values, or loop boundaries. Do not rewrite their code.";
+            break;
+        case 4:
+            hintInstruction = "Provide a 2-3 line code correction for the most immediate error in the user's code. Explain briefly why the correction works.";
+            break;
+        default:
+            hintInstruction = "Provide a SMALL, subtle hint or nudge to help them out. DO NOT write the full solution for them. Keep it under 3 sentences.";
+    }
+
+    const prompt = `You are a supportive programming peer acting as an AI Tutor. The student is working on this challenge:
 ${challengeDescription}
 
 Here is their current code:
-${code || '(No code written yet)'}
+${code}
 
-Provide a SMALL, subtle hint or nudge to help them out. DO NOT write the full solution for them. Keep it under 3 sentences. Only respond with valid JSON:
+Task: ${hintInstruction}
+
+Act like a friendly, supportive peer. KEEP IT CONCISE. Only respond with valid JSON:
 {
-  "hint": "your short hint here"
+  "hint": "your response here formatted nicely in markdown"
 }`;
 
     try {
