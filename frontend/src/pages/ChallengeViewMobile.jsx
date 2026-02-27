@@ -126,7 +126,7 @@ export default function ChallengeViewMobile() {
         setHintError('');
 
         try {
-            const res = await getHint(id, code);
+            const res = await getHint(id, { code });
             setHintText(res.data.hint);
             setHintCooldown(30);
         } catch (err) {
@@ -222,7 +222,7 @@ export default function ChallengeViewMobile() {
                     <span>📋 Challenge Description</span>
                     <span>{showDescription ? '▼' : '▶'}</span>
                 </button>
-                
+
                 {showDescription && (
                     <div style={{ padding: '0 var(--space-4) var(--space-4)' }} className="stack-sm">
                         <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)', margin: 0 }}>
