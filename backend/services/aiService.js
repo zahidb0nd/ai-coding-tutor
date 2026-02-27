@@ -17,6 +17,8 @@ Rubric: ${rubric}
 Student code:
 ${code}
 
+If the submitted language is C, explicitly evaluate the code for proper memory management, pointer usage, and standard C library imports.
+
 Respond ONLY with valid JSON, no explanation outside the JSON:
 {
   "score": 0-100,
