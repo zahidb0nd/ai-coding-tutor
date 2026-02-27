@@ -12,8 +12,8 @@ const submissionSchema = z.object({
     challengeId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid challenge ID'),
     code: z.string().min(1, 'Code cannot be empty'),
     language: z.string().optional().default('javascript'),
-    durationMs: z.number().int().optional(),
-    timezoneOffset: z.number().int().optional() // client's exact timezone offset in minutes
+    durationMs: z.number().int().optional().nullable(),
+    timezoneOffset: z.number().int().optional().nullable() // client's exact timezone offset in minutes
 });
 
 // POST /api/submissions — submit code for AI feedback

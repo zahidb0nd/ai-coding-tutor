@@ -54,58 +54,8 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET /api/challenges/:id — single challenge
-router.get('/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
+// The parameterized routes were moved to the bottom to avoid intercepting static routes
 
-        const challenge = await prisma.challenge.findUnique({ where: { id } });
-        if (!challenge) {
-            return res.status(404).json({ error: 'Challenge not found.' });
-        }
-
-        res.json(challenge);
-    } catch (err) {
-        console.error('Get challenge error:', err);
-        res.status(500).json({ error: 'Failed to fetch challenge.' });
-    }
-});
-
-// POST /api/challenges/:id/hint — Get a hint for a challenge
-router.post('/:id/hint', authMiddleware, async (req, res) => {
-    try {
-        const { id } = req.params;
-        const userId = req.user?.id;
-        const { code } = req.body;
-
-        // Rate limit: 1 hint per 30 seconds per user per challenge
-        if (userId) {
-            const rateKey = `${userId}-${id}`;
-            const lastHint = hintRates.get(rateKey);
-            if (lastHint && Date.now() - lastHint < 30000) {
-                return res.status(429).json({ error: 'Please wait 30 seconds before requesting another hint.' });
-            }
-            hintRates.set(rateKey, Date.now());
-        }
-
-        const challenge = await prisma.challenge.findUnique({ where: { id } });
-        if (!challenge) {
-            return res.status(404).json({ error: 'Challenge not found.' });
-        }
-
-        const hintRes = await getHint(code, challenge.description);
-
-        // Optionally update hinting stats
-        if (userId) {
-            // In a real app we might grab the "Pending" submission or just update the user's total hints.
-        }
-
-        res.json(hintRes);
-    } catch (err) {
-        console.error('Get hint error:', err);
-        res.status(500).json({ error: 'Failed to generate hint.' });
-    }
-});
 
 // POST /api/challenges/generate — Generate a new challenge with AI (legacy endpoint)
 router.post('/generate', authMiddleware, async (req, res) => {
@@ -228,6 +178,54 @@ router.post('/generate-advanced', authMiddleware, async (req, res) => {
         }
         console.error('Generate advanced challenge error:', err);
         res.status(500).json({ error: 'Failed to generate challenge. Please try again.' });
+    }
+});
+
+// GET /api/challenges/:id — single challenge (Must be at the bottom)
+router.get('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const challenge = await prisma.challenge.findUnique({ where: { id } });
+        if (!challenge) {
+            return res.status(404).json({ error: 'Challenge not found.' });
+        }
+
+        res.json(challenge);
+    } catch (err) {
+        console.error('Get challenge error:', err);
+        res.status(500).json({ error: 'Failed to fetch challenge.' });
+    }
+});
+
+// POST /api/challenges/:id/hint — Get a hint for a challenge (Must be at the bottom)
+router.post('/:id/hint', authMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user?.id;
+        const { code } = req.body;
+
+        // Rate limit: 1 hint per 30 seconds per user per challenge
+        if (userId) {
+            const rateKey = `${userId}-${id}`;
+            const lastHint = hintRates.get(rateKey);
+            if (lastHint && Date.now() - lastHint < 30000) {
+                return res.status(429).json({ error: 'Please wait 30 seconds before requesting another hint.' });
+            }
+            hintRates.set(rateKey, Date.now());
+        }
+
+        const challenge = await prisma.challenge.findUnique({ where: { id } });
+        if (!challenge) {
+            return res.status(404).json({ error: 'Challenge not found.' });
+        }
+
+        const hintRes = await getHint(code, challenge.description);
+
+        res.json(hintRes);
+    } catch (err) {
+        console.error('Get hint error:', err);
+        res.status(500).json({ error: 'Failed to generate hint.' });
     }
 });
 
