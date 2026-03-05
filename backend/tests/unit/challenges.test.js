@@ -16,7 +16,7 @@ app.use('/api/challenges', challengesRouter);
 describe('Challenges Routes Unit Tests', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         prisma.challenge = {
             findMany: vi.fn(),
             findUnique: vi.fn(),
@@ -141,6 +141,45 @@ describe('Challenges Routes Unit Tests', () => {
 
             expect(res.status).toBe(500);
             expect(res.body.error).toBe('Failed to fetch challenge.');
+        });
+    });
+
+    describe('GET /api/challenges/languages', () => {
+        it('returns sorted distinct languages', async () => {
+            prisma.challenge.findMany.mockResolvedValue([
+                { language: 'python' },
+                { language: 'c' },
+                { language: 'javascript' },
+            ]);
+
+            const res = await request(app).get('/api/challenges/languages');
+
+            expect(res.status).toBe(200);
+            expect(res.body).toEqual(['c', 'javascript', 'python']);
+            expect(prisma.challenge.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    distinct: ['language'],
+                    select: { language: true },
+                })
+            );
+        });
+
+        it('returns empty array when no challenges exist', async () => {
+            prisma.challenge.findMany.mockResolvedValue([]);
+
+            const res = await request(app).get('/api/challenges/languages');
+
+            expect(res.status).toBe(200);
+            expect(res.body).toEqual([]);
+        });
+
+        it('handles database errors gracefully', async () => {
+            prisma.challenge.findMany.mockRejectedValue(new Error('DB error'));
+
+            const res = await request(app).get('/api/challenges/languages');
+
+            expect(res.status).toBe(500);
+            expect(res.body.error).toBe('Failed to fetch languages.');
         });
     });
 });

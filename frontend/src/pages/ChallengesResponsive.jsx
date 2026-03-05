@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getChallenges } from '../api';
+import { getChallenges, getLanguages } from '../api';
 import ChallengeCard from '../components/ChallengeCard';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
@@ -10,10 +10,14 @@ export default function Challenges() {
     const [error, setError] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('all');
     const [selectedLanguage, setSelectedLanguage] = useState('all');
+    const [languages, setLanguages] = useState([]);
     const isMobile = useIsMobile();
 
     useEffect(() => {
         fetchChallenges();
+        getLanguages()
+            .then((res) => setLanguages(res.data))
+            .catch(() => { });
     }, []);
 
     const fetchChallenges = async () => {
@@ -86,10 +90,11 @@ export default function Challenges() {
                     }}
                 >
                     <option value="all">All Languages</option>
-                    <option value="javascript">JavaScript</option>
-                    <option value="typescript">TypeScript</option>
-                    <option value="python">Python</option>
-                    <option value="c">C</option>
+                    {languages.map((lang) => (
+                        <option key={lang} value={lang}>
+                            {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                        </option>
+                    ))}
                 </select>
             </div>
 

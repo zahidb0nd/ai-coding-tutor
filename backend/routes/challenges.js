@@ -56,6 +56,25 @@ router.get('/', async (req, res) => {
 
 // The parameterized routes were moved to the bottom to avoid intercepting static routes
 
+// GET /api/challenges/languages — return distinct languages from challenges
+router.get('/languages', async (req, res) => {
+    try {
+        const results = await prisma.challenge.findMany({
+            distinct: ['language'],
+            select: { language: true },
+        });
+
+        const languages = results
+            .map((r) => r.language)
+            .filter(Boolean)
+            .sort((a, b) => a.localeCompare(b));
+
+        res.json(languages);
+    } catch (err) {
+        console.error('List languages error:', err);
+        res.status(500).json({ error: 'Failed to fetch languages.' });
+    }
+});
 
 // POST /api/challenges/generate — Generate a new challenge with AI (legacy endpoint)
 router.post('/generate', authMiddleware, async (req, res) => {
