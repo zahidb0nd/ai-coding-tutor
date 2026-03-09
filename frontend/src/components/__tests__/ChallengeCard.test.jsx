@@ -18,64 +18,64 @@ describe('ChallengeCard Component', () => {
 
     it('renders challenge title', () => {
         renderWithRouter(<ChallengeCard challenge={mockChallenge} />);
-        
+
         expect(screen.getByText('Reverse a String')).toBeInTheDocument();
     });
 
     it('renders challenge description', () => {
         renderWithRouter(<ChallengeCard challenge={mockChallenge} />);
-        
+
         expect(screen.getByText(/write a function that reverses a string/i)).toBeInTheDocument();
     });
 
     it('displays difficulty level', () => {
         renderWithRouter(<ChallengeCard challenge={mockChallenge} />);
-        
-        // Difficulty 2 should show as "Easy"
-        expect(screen.getByText(/easy/i)).toBeInTheDocument();
+
+        // Difficulty 2 = "Easy" in the component's difficultyLabels
+        expect(screen.getByText('Easy')).toBeInTheDocument();
     });
 
     it('displays programming language', () => {
         renderWithRouter(<ChallengeCard challenge={mockChallenge} />);
-        
+
         expect(screen.getByText(/javascript/i)).toBeInTheDocument();
     });
 
     it('shows correct difficulty label for level 1', () => {
         const beginnerChallenge = { ...mockChallenge, difficulty: 1 };
         renderWithRouter(<ChallengeCard challenge={beginnerChallenge} />);
-        
-        expect(screen.getByText(/beginner/i)).toBeInTheDocument();
+
+        expect(screen.getByText('Beginner')).toBeInTheDocument();
     });
 
     it('shows correct difficulty label for level 3', () => {
         const mediumChallenge = { ...mockChallenge, difficulty: 3 };
         renderWithRouter(<ChallengeCard challenge={mediumChallenge} />);
-        
-        expect(screen.getByText(/medium/i)).toBeInTheDocument();
+
+        expect(screen.getByText('Medium')).toBeInTheDocument();
     });
 
     it('shows correct difficulty label for level 4', () => {
         const hardChallenge = { ...mockChallenge, difficulty: 4 };
         renderWithRouter(<ChallengeCard challenge={hardChallenge} />);
-        
-        expect(screen.getByText(/hard/i)).toBeInTheDocument();
+
+        expect(screen.getByText('Hard')).toBeInTheDocument();
     });
 
     it('shows correct difficulty label for level 5', () => {
         const expertChallenge = { ...mockChallenge, difficulty: 5 };
         renderWithRouter(<ChallengeCard challenge={expertChallenge} />);
-        
-        expect(screen.getByText(/expert/i)).toBeInTheDocument();
+
+        expect(screen.getByText('Expert')).toBeInTheDocument();
     });
 
     it('is clickable and navigates to challenge detail', () => {
         renderWithRouter(<ChallengeCard challenge={mockChallenge} />);
-        
-        const card = screen.getByText('Reverse a String').closest('a') || 
-                     screen.getByText('Reverse a String').closest('div[role="button"]');
-        
+
+        // ChallengeCard uses a div with onClick, not an <a> tag
+        const card = screen.getByText('Reverse a String').closest('div[style]');
         expect(card).toBeInTheDocument();
+        expect(card.style.cursor).toBe('pointer');
     });
 
     it('truncates long descriptions', () => {
@@ -83,9 +83,9 @@ describe('ChallengeCard Component', () => {
             ...mockChallenge,
             description: 'This is a very long description that should be truncated because it exceeds the maximum character limit that we want to display in the card view. We want to keep the UI clean and not overwhelm users with too much text.',
         };
-        
+
         renderWithRouter(<ChallengeCard challenge={longDescriptionChallenge} />);
-        
+
         // Check that some text is displayed
         expect(screen.getByText(/this is a very long description/i)).toBeInTheDocument();
     });
@@ -96,9 +96,9 @@ describe('ChallengeCard Component', () => {
             title: 'Minimal Challenge',
             difficulty: 1,
         };
-        
+
         renderWithRouter(<ChallengeCard challenge={minimalChallenge} />);
-        
+
         expect(screen.getByText('Minimal Challenge')).toBeInTheDocument();
     });
 });

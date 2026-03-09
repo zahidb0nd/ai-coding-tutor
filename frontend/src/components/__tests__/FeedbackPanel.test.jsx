@@ -3,16 +3,17 @@ import { render, screen } from '@testing-library/react';
 import FeedbackPanel from '../FeedbackPanel';
 
 describe('FeedbackPanel Component', () => {
-    it('shows loading state when loading prop is true', () => {
-        render(<FeedbackPanel loading={true} feedback={null} />);
-        
-        expect(screen.getByText(/analyzing your code/i)).toBeInTheDocument();
+    it('shows loading state when isStreaming prop is true', () => {
+        render(<FeedbackPanel isStreaming={true} feedback={null} />);
+
+        expect(screen.getByText(/ai is reviewing your code/i)).toBeInTheDocument();
     });
 
-    it('shows empty state when no feedback and not loading', () => {
-        render(<FeedbackPanel loading={false} feedback={null} />);
-        
-        expect(screen.getByText(/submit your code/i)).toBeInTheDocument();
+    it('shows empty state when no feedback and not streaming', () => {
+        render(<FeedbackPanel isStreaming={false} feedback={null} />);
+
+        expect(screen.getByText(/write your solution/i)).toBeInTheDocument();
+        expect(screen.getByText(/get feedback/i)).toBeInTheDocument();
     });
 
     it('displays score when feedback is provided', () => {
@@ -22,9 +23,9 @@ describe('FeedbackPanel Component', () => {
             line_comments: [],
             next_steps: [],
         };
-        
-        render(<FeedbackPanel loading={false} feedback={feedback} />);
-        
+
+        render(<FeedbackPanel isStreaming={false} feedback={feedback} />);
+
         expect(screen.getByText('85')).toBeInTheDocument();
     });
 
@@ -35,9 +36,9 @@ describe('FeedbackPanel Component', () => {
             line_comments: [],
             next_steps: [],
         };
-        
-        render(<FeedbackPanel loading={false} feedback={feedback} />);
-        
+
+        render(<FeedbackPanel isStreaming={false} feedback={feedback} />);
+
         expect(screen.getByText(/good effort, but needs improvement/i)).toBeInTheDocument();
     });
 
@@ -51,9 +52,9 @@ describe('FeedbackPanel Component', () => {
             ],
             next_steps: [],
         };
-        
-        render(<FeedbackPanel loading={false} feedback={feedback} />);
-        
+
+        render(<FeedbackPanel isStreaming={false} feedback={feedback} />);
+
         expect(screen.getByText(/line 5/i)).toBeInTheDocument();
         expect(screen.getByText(/missing semicolon/i)).toBeInTheDocument();
         expect(screen.getByText(/line 10/i)).toBeInTheDocument();
@@ -67,9 +68,9 @@ describe('FeedbackPanel Component', () => {
             line_comments: [],
             next_steps: ['Learn about arrow functions', 'Practice async/await'],
         };
-        
-        render(<FeedbackPanel loading={false} feedback={feedback} />);
-        
+
+        render(<FeedbackPanel isStreaming={false} feedback={feedback} />);
+
         expect(screen.getByText(/learn about arrow functions/i)).toBeInTheDocument();
         expect(screen.getByText(/practice async\/await/i)).toBeInTheDocument();
     });
@@ -81,11 +82,11 @@ describe('FeedbackPanel Component', () => {
             line_comments: [],
             next_steps: [],
         };
-        
-        const { container } = render(<FeedbackPanel loading={false} feedback={feedback} />);
-        
-        // Check that score is displayed
+
+        render(<FeedbackPanel isStreaming={false} feedback={feedback} />);
+
         expect(screen.getByText('90')).toBeInTheDocument();
+        expect(screen.getByText(/great job/i)).toBeInTheDocument();
     });
 
     it('shows warning styling for scores between 40-69', () => {
@@ -95,10 +96,11 @@ describe('FeedbackPanel Component', () => {
             line_comments: [],
             next_steps: [],
         };
-        
-        const { container } = render(<FeedbackPanel loading={false} feedback={feedback} />);
-        
+
+        render(<FeedbackPanel isStreaming={false} feedback={feedback} />);
+
         expect(screen.getByText('55')).toBeInTheDocument();
+        expect(screen.getByText(/getting there/i)).toBeInTheDocument();
     });
 
     it('shows danger styling for scores < 40', () => {
@@ -108,10 +110,11 @@ describe('FeedbackPanel Component', () => {
             line_comments: [],
             next_steps: [],
         };
-        
-        const { container } = render(<FeedbackPanel loading={false} feedback={feedback} />);
-        
+
+        render(<FeedbackPanel isStreaming={false} feedback={feedback} />);
+
         expect(screen.getByText('30')).toBeInTheDocument();
+        expect(screen.getByText(/keep practicing/i)).toBeInTheDocument();
     });
 
     it('handles feedback with no line comments gracefully', () => {
@@ -121,9 +124,9 @@ describe('FeedbackPanel Component', () => {
             line_comments: [],
             next_steps: ['Keep practicing'],
         };
-        
-        render(<FeedbackPanel loading={false} feedback={feedback} />);
-        
+
+        render(<FeedbackPanel isStreaming={false} feedback={feedback} />);
+
         expect(screen.getByText('80')).toBeInTheDocument();
         expect(screen.getByText(/good job!/i)).toBeInTheDocument();
     });
@@ -135,9 +138,9 @@ describe('FeedbackPanel Component', () => {
             line_comments: [{ line: 1, comment: 'Nice code structure' }],
             next_steps: [],
         };
-        
-        render(<FeedbackPanel loading={false} feedback={feedback} />);
-        
+
+        render(<FeedbackPanel isStreaming={false} feedback={feedback} />);
+
         expect(screen.getByText('100')).toBeInTheDocument();
         expect(screen.getByText(/perfect!/i)).toBeInTheDocument();
     });

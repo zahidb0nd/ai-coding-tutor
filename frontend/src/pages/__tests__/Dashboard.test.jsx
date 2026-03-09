@@ -14,6 +14,9 @@ vi.mock('recharts', () => ({
     Tooltip: () => null,
     ResponsiveContainer: ({ children }) => <div>{children}</div>,
 }));
+vi.mock('../../hooks/useMediaQuery', () => ({
+    useIsMobile: () => false,
+}));
 
 const renderWithRouter = (component) => {
     return render(<BrowserRouter>{component}</BrowserRouter>);
@@ -23,7 +26,7 @@ describe('Dashboard Page Integration Tests', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
-        
+
         const mockUser = {
             id: '123',
             name: 'Test User',
@@ -36,10 +39,11 @@ describe('Dashboard Page Integration Tests', () => {
     it('displays loading state while fetching data', () => {
         api.getUserProgress = vi.fn(() => new Promise(() => {})); // Never resolves
         api.getSubmissions = vi.fn(() => new Promise(() => {}));
-        
-        renderWithRouter(<Dashboard />);
-        
-        expect(screen.getByRole('status') || document.querySelector('.loading-shimmer')).toBeInTheDocument();
+
+        const { container } = renderWithRouter(<Dashboard />);
+
+        // Loading state uses shimmer divs
+        expect(container.querySelector('.loading-shimmer')).toBeInTheDocument();
     });
 
     it('displays user progress statistics', async () => {
@@ -57,12 +61,12 @@ describe('Dashboard Page Integration Tests', () => {
                 recentScores: [],
             },
         };
-        
+
         api.getUserProgress = vi.fn().mockResolvedValue(mockProgress);
         api.getSubmissions = vi.fn().mockResolvedValue({ data: [] });
-        
+
         renderWithRouter(<Dashboard />);
-        
+
         await waitFor(() => {
             expect(screen.getByText('25')).toBeInTheDocument(); // Total submissions
             expect(screen.getByText('78')).toBeInTheDocument(); // Average score
@@ -89,12 +93,12 @@ describe('Dashboard Page Integration Tests', () => {
                 ],
             },
         };
-        
+
         api.getUserProgress = vi.fn().mockResolvedValue(mockProgress);
         api.getSubmissions = vi.fn().mockResolvedValue({ data: [] });
-        
+
         renderWithRouter(<Dashboard />);
-        
+
         await waitFor(() => {
             expect(screen.getByTestId('line-chart')).toBeInTheDocument();
         });
@@ -115,7 +119,7 @@ describe('Dashboard Page Integration Tests', () => {
                 recentScores: [],
             },
         };
-        
+
         const mockSubmissions = {
             data: [
                 {
@@ -132,12 +136,12 @@ describe('Dashboard Page Integration Tests', () => {
                 },
             ],
         };
-        
+
         api.getUserProgress = vi.fn().mockResolvedValue(mockProgress);
         api.getSubmissions = vi.fn().mockResolvedValue(mockSubmissions);
-        
+
         renderWithRouter(<Dashboard />);
-        
+
         await waitFor(() => {
             expect(screen.getByText('Array Methods')).toBeInTheDocument();
             expect(screen.getByText('String Manipulation')).toBeInTheDocument();
@@ -147,20 +151,20 @@ describe('Dashboard Page Integration Tests', () => {
     it('handles errors gracefully', async () => {
         api.getUserProgress = vi.fn().mockRejectedValue(new Error('Network error'));
         api.getSubmissions = vi.fn().mockRejectedValue(new Error('Network error'));
-        
+
         renderWithRouter(<Dashboard />);
-        
+
         await waitFor(() => {
-            expect(screen.getByText(/failed to load/i) || screen.getByText(/error/i)).toBeInTheDocument();
+            expect(screen.getByText(/failed to load/i)).toBeInTheDocument();
         });
     });
 
     it('shows retry button on error', async () => {
         api.getUserProgress = vi.fn().mockRejectedValue(new Error('Network error'));
         api.getSubmissions = vi.fn().mockRejectedValue(new Error('Network error'));
-        
+
         renderWithRouter(<Dashboard />);
-        
+
         await waitFor(() => {
             const retryButton = screen.getByText(/retry/i);
             expect(retryButton).toBeInTheDocument();
@@ -182,22 +186,30 @@ describe('Dashboard Page Integration Tests', () => {
                 recentScores: [],
             },
         };
-        
+
         api.getUserProgress = vi.fn().mockResolvedValue(mockProgress);
         api.getSubmissions = vi.fn().mockResolvedValue({ data: [] });
-        
+
+        // Use level 3 user for this test
+        localStorage.setItem('user', JSON.stringify({
+            id: '123',
+            name: 'Test User',
+            email: 'test@example.com',
+            level: 3,
+        }));
+
         renderWithRouter(<Dashboard />);
-        
+
         await waitFor(() => {
-            expect(screen.getByText(/intermediate/i) || screen.getByText(/level 3/i)).toBeInTheDocument();
+            expect(screen.getByText(/intermediate/i)).toBeInTheDocument();
         });
     });
 
     it('redirects to login if user is not authenticated', () => {
         localStorage.removeItem('user');
-        
+
         renderWithRouter(<Dashboard />);
-        
+
         // Component should handle redirect (verify via navigation mock in real scenario)
     });
 });

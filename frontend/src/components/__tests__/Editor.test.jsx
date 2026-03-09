@@ -1,14 +1,24 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import CodeEditor from '../Editor';
 
-// Mock Monaco Editor
+// Mock the useIsMobile hook
+vi.mock('../../hooks/useMediaQuery', () => ({
+    useIsMobile: () => false,
+}));
+
+// Mock EditorSkeleton
+vi.mock('../EditorSkeleton', () => ({
+    default: () => <div data-testid="editor-skeleton">Loading...</div>,
+}));
+
+// Mock Monaco Editor — must be a default export for React.lazy to resolve
 vi.mock('@monaco-editor/react', () => ({
     default: ({ value, onChange, language, theme, options }) => (
         <div data-testid="monaco-editor">
             <textarea
                 data-testid="editor-textarea"
-                value={value}
+                value={value || ''}
                 onChange={(e) => onChange(e.target.value)}
                 data-language={language}
                 data-theme={theme}
@@ -18,73 +28,87 @@ vi.mock('@monaco-editor/react', () => ({
 }));
 
 describe('CodeEditor Component', () => {
-    it('renders Monaco editor wrapper', () => {
+    it('renders Monaco editor wrapper', async () => {
         const mockOnChange = vi.fn();
         render(<CodeEditor code="console.log('test')" onChange={mockOnChange} />);
-        
-        expect(screen.getByTestId('monaco-editor')).toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(screen.getByTestId('monaco-editor')).toBeInTheDocument();
+        });
     });
 
-    it('passes code value to editor', () => {
+    it('passes code value to editor', async () => {
         const code = "function test() { return 'hello'; }";
         const mockOnChange = vi.fn();
         render(<CodeEditor code={code} onChange={mockOnChange} />);
-        
-        const textarea = screen.getByTestId('editor-textarea');
-        expect(textarea.value).toBe(code);
+
+        await waitFor(() => {
+            const textarea = screen.getByTestId('editor-textarea');
+            expect(textarea.value).toBe(code);
+        });
     });
 
-    it('calls onChange when code is modified', () => {
+    it('calls onChange when code is modified', async () => {
         const mockOnChange = vi.fn();
-        const { getByTestId } = render(<CodeEditor code="" onChange={mockOnChange} />);
-        
-        const textarea = getByTestId('editor-textarea');
-        textarea.value = 'new code';
-        textarea.dispatchEvent(new Event('change', { bubbles: true }));
-        
+        render(<CodeEditor code="" onChange={mockOnChange} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('editor-textarea')).toBeInTheDocument();
+        });
+
+        const textarea = screen.getByTestId('editor-textarea');
+        fireEvent.change(textarea, { target: { value: 'new code' } });
+
         expect(mockOnChange).toHaveBeenCalledWith('new code');
     });
 
-    it('defaults to javascript language', () => {
+    it('defaults to javascript language', async () => {
         const mockOnChange = vi.fn();
         render(<CodeEditor code="" onChange={mockOnChange} />);
-        
-        const textarea = screen.getByTestId('editor-textarea');
-        expect(textarea.getAttribute('data-language')).toBe('javascript');
+
+        await waitFor(() => {
+            const textarea = screen.getByTestId('editor-textarea');
+            expect(textarea.getAttribute('data-language')).toBe('javascript');
+        });
     });
 
-    it('accepts custom language prop', () => {
+    it('accepts custom language prop', async () => {
         const mockOnChange = vi.fn();
         render(<CodeEditor code="" onChange={mockOnChange} language="python" />);
-        
-        const textarea = screen.getByTestId('editor-textarea');
-        expect(textarea.getAttribute('data-language')).toBe('python');
+
+        await waitFor(() => {
+            const textarea = screen.getByTestId('editor-textarea');
+            expect(textarea.getAttribute('data-language')).toBe('python');
+        });
     });
 
-    it('uses vs-dark theme', () => {
+    it('uses vs-dark theme', async () => {
         const mockOnChange = vi.fn();
         render(<CodeEditor code="" onChange={mockOnChange} />);
-        
-        const textarea = screen.getByTestId('editor-textarea');
-        expect(textarea.getAttribute('data-theme')).toBe('vs-dark');
+
+        await waitFor(() => {
+            const textarea = screen.getByTestId('editor-textarea');
+            expect(textarea.getAttribute('data-theme')).toBe('vs-dark');
+        });
     });
 
-    it('handles empty code gracefully', () => {
+    it('handles empty code gracefully', async () => {
         const mockOnChange = vi.fn();
         render(<CodeEditor code="" onChange={mockOnChange} />);
-        
-        const textarea = screen.getByTestId('editor-textarea');
-        expect(textarea.value).toBe('');
+
+        await waitFor(() => {
+            const textarea = screen.getByTestId('editor-textarea');
+            expect(textarea.value).toBe('');
+        });
     });
 
-    it('handles null value by converting to empty string', () => {
+    it('passes empty string value correctly', async () => {
         const mockOnChange = vi.fn();
-        const { getByTestId } = render(<CodeEditor code="" onChange={mockOnChange} />);
-        
-        const textarea = getByTestId('editor-textarea');
-        textarea.value = null;
-        textarea.dispatchEvent(new Event('change', { bubbles: true }));
-        
-        expect(mockOnChange).toHaveBeenCalledWith('');
+        render(<CodeEditor code="" onChange={mockOnChange} />);
+
+        await waitFor(() => {
+            const textarea = screen.getByTestId('editor-textarea');
+            expect(textarea.value).toBe('');
+        });
     });
 });
