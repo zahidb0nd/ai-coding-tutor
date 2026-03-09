@@ -263,7 +263,8 @@ export default function ChallengeView() {
                         value={language}
                         onChange={(e) => {
                             const newLang = e.target.value;
-                            if (code === LANGUAGE_TEMPLATES[language]) {
+                            const isTemplate = Object.values(LANGUAGE_TEMPLATES).some(t => code === t);
+                            if (isTemplate || !code.trim()) {
                                 setCode(LANGUAGE_TEMPLATES[newLang]);
                             }
                             setLanguage(newLang);
