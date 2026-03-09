@@ -474,7 +474,7 @@ export default function ChallengeView() {
                     </div>
 
                     {/* Tab Content */}
-                    <div style={{ flex: 1, overflowY: activeTab === 'tutor' ? 'hidden' : 'auto' }}>
+                    <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
                         {activeTab === 'tutor' ? (
                             <AITutorPanel
                                 code={code}

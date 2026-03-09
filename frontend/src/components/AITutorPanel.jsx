@@ -21,7 +21,7 @@ export default function AITutorPanel({ code, challenge, onGetHint, hintResponse,
     };
 
     return (
-        <div style={{ padding: 24, display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div style={{ padding: 24, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, overflow: 'auto' }}>
             <h3 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
                 🤖 AI Tutor
             </h3>
