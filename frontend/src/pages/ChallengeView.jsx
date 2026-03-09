@@ -413,6 +413,8 @@ export default function ChallengeView() {
                         style={{
                             padding: 20,
                             borderBottom: '1px solid var(--border)',
+                            maxHeight: '35vh',
+                            overflowY: 'auto',
                             flexShrink: 0,
                         }}
                     >
@@ -474,7 +476,7 @@ export default function ChallengeView() {
                     </div>
 
                     {/* Tab Content */}
-                    <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+                    <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
                         {activeTab === 'tutor' ? (
                             <AITutorPanel
                                 code={code}
