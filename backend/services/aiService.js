@@ -1,6 +1,12 @@
 const Groq = require('groq-sdk');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let _groq;
+function getGroqClient() {
+    if (!_groq) {
+        _groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    }
+    return _groq;
+}
 
 /**
  * Get AI feedback on student code
@@ -30,7 +36,7 @@ Respond ONLY with valid JSON, no explanation outside the JSON:
 }`;
 
     try {
-        const response = await groq.chat.completions.create({
+        const response = await getGroqClient().chat.completions.create({
             model: 'llama-3.3-70b-versatile',
             messages: [{ role: 'user', content: prompt }],
             response_format: { type: 'json_object' },
@@ -45,7 +51,7 @@ Respond ONLY with valid JSON, no explanation outside the JSON:
 
         // If first attempt fails, try once more
         try {
-            const retryResponse = await groq.chat.completions.create({
+            const retryResponse = await getGroqClient().chat.completions.create({
                 model: 'llama-3.3-70b-versatile',
                 messages: [{ role: 'user', content: prompt }],
                 response_format: { type: 'json_object' },
@@ -90,7 +96,7 @@ Respond ONLY with valid JSON, no explanation outside the JSON:
 }`;
 
     // Note: Llama 3 models on Groq natively support stream
-    return await groq.chat.completions.create({
+    return await getGroqClient().chat.completions.create({
         model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
         stream: true,
@@ -216,7 +222,7 @@ Respond ONLY with valid JSON matching this exact schema:
 }`;
 
     try {
-        const response = await groq.chat.completions.create({
+        const response = await getGroqClient().chat.completions.create({
             model: 'llama-3.3-70b-versatile',
             messages: [{ role: 'user', content: prompt }],
             response_format: { type: 'json_object' },
@@ -320,7 +326,7 @@ Act like a friendly, supportive peer. KEEP IT CONCISE. Only respond with valid J
 }`;
 
     try {
-        const response = await groq.chat.completions.create({
+        const response = await getGroqClient().chat.completions.create({
             model: 'llama-3.3-70b-versatile',
             messages: [{ role: 'user', content: prompt }],
             response_format: { type: 'json_object' },

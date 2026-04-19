@@ -1,3 +1,6 @@
+// Set dummy API key so Groq SDK can be instantiated in tests (nock intercepts actual calls)
+process.env.GROQ_API_KEY = process.env.GROQ_API_KEY || 'test-dummy-key';
+
 import { beforeAll, afterAll, afterEach } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 
