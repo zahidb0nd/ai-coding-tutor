@@ -1,0 +1,22 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/zahid/Downloads/ai-coding-tutor-main/frontend[39m
+
+ [32mΓ£ô[39m src/api/__tests__/index.test.js [2m([22m[2m12 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/FeedbackPanel.test.jsx [2m([22m[2m11 tests[22m[2m)[22m[33m 645[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/Editor.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[33m 656[2mms[22m[39m
+     [33m[2mΓ£ô[22m[39m renders Monaco editor wrapper [33m 460[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ChallengeCard.test.jsx [2m([22m[2m11 tests[22m[2m)[22m[33m 802[2mms[22m[39m
+     [33m[2mΓ£ô[22m[39m renders challenge title [33m 350[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/Navbar.test.jsx [2m([22m[2m10 tests[22m[2m)[22m[33m 879[2mms[22m[39m
+     [33m[2mΓ£ô[22m[39m shows user navigation when logged in [33m 330[2mms[22m[39m
+ [32mΓ£ô[39m src/pages/__tests__/Dashboard.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[33m 788[2mms[22m[39m
+ [32mΓ£ô[39m src/pages/__tests__/Login.test.jsx [2m([22m[2m9 tests[22m[2m)[22m[33m 2593[2mms[22m[39m
+     [33m[2mΓ£ô[22m[39m renders login and register tabs [33m 368[2mms[22m[39m
+     [33m[2mΓ£ô[22m[39m shows Sign In button in login mode [33m 654[2mms[22m[39m
+     [33m[2mΓ£ô[22m[39m shows Create Account button in register mode [33m 376[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[32m69 passed[39m[22m[90m (69)[39m
+[2m   Start at [22m 00:57:42
+[2m   Duration [22m 13.45s[2m (transform 2.78s, setup 10.40s, import 4.41s, tests 6.41s, environment 46.86s)[22m
+

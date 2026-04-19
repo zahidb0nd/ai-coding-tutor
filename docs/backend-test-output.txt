@@ -1,0 +1,215 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/zahid/Downloads/ai-coding-tutor-main/backend[39m
+
+node.exe : [90mstderr[2m | tests/unit/users.test.js[2m > [22m[2mUsers Routes Unit Tests[2m > [22m[2mGET 
+/api/users/leaderboard[2m > [22m[2mhandles database errors gracefully
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([90mstderr[2m...rors gracefully:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[22m[39mLeaderboard error: Error: DB connection failed
+    at C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/tests/unit/users.test.js:109:52
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:145:11
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:915:26
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest
+/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1653:37
+    at Traces.$ [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/d
+ist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/dist
+/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner
+[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstderr[2m | tests/unit/users.test.js[2m > [22m[2mUsers Routes Unit Tests[2m > [22m[2mGET 
+/api/users/:id/progress[2m > [22m[2mhandles database errors gracefully
+[22m[39mGet progress error: Error: DB error
+    at C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/tests/unit/users.test.js:238:54
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:145:11
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:915:26
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest
+/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1653:37
+    at Traces.$ [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/d
+ist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/dist
+/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner
+[24m/dist/index.js:1653:12[90m)[39m
+
+ [32mΓ£ô[39m tests/unit/users.test.js [2m([22m[2m11 tests[22m[2m)[22m[33m 503[2mms[22m[39m
+[90mstderr[2m | tests/unit/challenges.test.js[2m > [22m[2mChallenges Routes Unit Tests[2m > [22m[2mGET 
+/api/challenges[2m > [22m[2mhandles database errors gracefully
+[22m[39mList challenges error: Error: DB error
+    at C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/tests/unit/challenges.test.js:99:57
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:145:11
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:915:26
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest
+/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1653:37
+    at Traces.$ [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/d
+ist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/dist
+/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner
+[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstderr[2m | tests/unit/challenges.test.js[2m > [22m[2mChallenges Routes Unit Tests[2m > [22m[2mGET 
+/api/challenges/:id[2m > [22m[2mhandles database errors gracefully
+[22m[39mGet challenge error: Error: DB error
+    at C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/tests/unit/challenges.test.js:138:59
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:145:11
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:915:26
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest
+/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1653:37
+    at Traces.$ [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/d
+ist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/dist
+/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner
+[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstderr[2m | tests/unit/challenges.test.js[2m > [22m[2mChallenges Routes Unit Tests[2m > [22m[2mGET 
+/api/challenges/languages[2m > [22m[2mhandles database errors gracefully
+[22m[39mList languages error: Error: DB error
+    at C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/tests/unit/challenges.test.js:177:57
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:145:11
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:915:26
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest
+/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner[24m/dis
+t/index.js:1653:37
+    at Traces.$ [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/d
+ist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4mvitest[24m/dist
+/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/[39mnode_modules/[4m@vitest/runner
+[24m/dist/index.js:1653:12[90m)[39m
+
+ [32mΓ£ô[39m tests/unit/challenges.test.js [2m([22m[2m12 tests[22m[2m)[22m[33m 380[2mms[22m[39m
+[90mstderr[2m | tests/ai-safety/groq-hints.test.js[2m > [22m[2mAI Service Contract & Safety Tests (nock)[2m > 
+[22m[2mgetHint()[2m > [22m[2mthrows an error if Groq API fails entirely
+[22m[39mGroq getHint error: Connection error.
+
+ [32mΓ£ô[39m tests/integration/auth-flow.test.js [2m([22m[2m5 tests[22m[2m)[22m[33m 2095[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m registers user, logs in, and accesses protected resource [33m 1483[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m prevents duplicate registration [33m 416[2mms[22m[39m
+[90mstdout[2m | tests/integration/submissions.test.js[2m > [22m[2mIntegration: POST /api/submissions[2m > [22m[2mrejects invalid inputs based on schema without hitting DB
+[22m[39mSubmission body: {
+  userId: [32m'invalid-id'[39m,
+  challengeId: [32m'507f191e810c19729de860ea'[39m,
+  code: [32m"print('Hello World')"[39m,
+  language: [32m'python'[39m
+}
+
+[90mstdout[2m | tests/integration/submissions.test.js[2m > [22m[2mIntegration: POST /api/submissions[2m > [22m[2mreturns 404 if user is not found
+[22m[39mSubmission body: {
+  userId: [32m'507f1f77bcf86cd799439011'[39m,
+  challengeId: [32m'507f191e810c19729de860ea'[39m,
+  code: [32m"print('Hello World')"[39m,
+  language: [32m'python'[39m
+}
+
+[90mstdout[2m | tests/integration/submissions.test.js[2m > [22m[2mIntegration: POST /api/submissions[2m > [22m[2mreturns 404 if challenge is not found
+[22m[39mSubmission body: {
+  userId: [32m'507f1f77bcf86cd799439011'[39m,
+  challengeId: [32m'507f191e810c19729de860ea'[39m,
+  code: [32m"print('Hello World')"[39m,
+  language: [32m'python'[39m
+}
+
+[90mstdout[2m | tests/integration/submissions.test.js[2m > [22m[2mIntegration: POST /api/submissions[2m > [22m[2mprocesses valid submission successfully and increments streak
+[22m[39mSubmission body: {
+  userId: [32m'507f1f77bcf86cd799439011'[39m,
+  challengeId: [32m'507f191e810c19729de860ea'[39m,
+  code: [32m"print('Hello World')"[39m,
+  language: [32m'python'[39m
+}
+
+ [32mΓ£ô[39m tests/integration/submissions.test.js [2m([22m[2m4 tests[22m[2m)[22m[33m 473[2mms[22m[39m
+ [32mΓ£ô[39m tests/unit/streak.test.js [2m([22m[2m5 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32mΓ£ô[39m tests/unit/auth.test.js [2m([22m[2m13 tests[22m[2m)[22m[33m 2573[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m successfully registers a new user with valid data [33m 678[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m hashes password before storing [33m 348[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m successfully logs in with correct credentials [33m 385[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m rejects login with incorrect password [33m 360[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m returns valid JWT token on successful login [33m 371[2mms[22m[39m
+[90mstderr[2m | tests/ai-safety/groq-hints.test.js[2m > [22m[2mAI Service Contract & Safety Tests (nock)[2m > 
+[22m[2mgetCodeFeedback()[2m > [22m[2mfalls back to safe default response if AI fails twice
+[22m[39mGroq getCodeFeedback error: Connection error.
+
+[90mstderr[2m | tests/integration/challenges-integration.test.js[2m > [22m[2mChallenges Integration Tests[2m > 
+[22m[2mPOST /api/challenges/:id/hint[2m > [22m[2mhandles AI service failures gracefully
+[22m[39mGroq getHint error: Connection error.
+
+[90mstderr[2m | tests/integration/challenges-integration.test.js[2m > [22m[2mChallenges Integration Tests[2m > 
+[22m[2mPOST /api/challenges/:id/hint[2m > [22m[2mhandles AI service failures gracefully
+[22m[39mGet hint error: Error: Failed to get hint. Please try again.
+    at getHint [90m(C:\Users\zahid\Downloads\ai-coding-tutor-main\backend\[39mservices\aiService.js:334:15[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+    at C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/routes/challenges.js:242:25
+
+[90mstderr[2m | tests/ai-safety/groq-hints.test.js[2m > [22m[2mAI Service Contract & Safety Tests (nock)[2m > 
+[22m[2mgetCodeFeedback()[2m > [22m[2mfalls back to safe default response if AI fails twice
+[22m[39mGroq retry failed: Connection error.
+
+ [32mΓ£ô[39m tests/ai-safety/groq-hints.test.js [2m([22m[2m5 tests[22m[2m)[22m[33m 5293[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m requests a JSON object with a hint key [33m 500[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m throws an error if Groq API fails entirely [33m 1496[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m falls back to safe default response if AI fails twice [33m 3117[2mms[22m[39m
+[90mstderr[2m | tests/integration/challenges-integration.test.js[2m > [22m[2mChallenges Integration Tests[2m > 
+[22m[2mPOST /api/challenges/generate[2m > [22m[2mhandles AI generation failures
+[22m[39mGroq generateChallengeFromSpec error: Connection error.
+
+[90mstderr[2m | tests/integration/challenges-integration.test.js[2m > [22m[2mChallenges Integration Tests[2m > 
+[22m[2mPOST /api/challenges/generate[2m > [22m[2mhandles AI generation failures
+[22m[39mGenerate challenge error: Error: Failed to generate challenge. Please try again.
+    at generateChallengeFromSpec 
+[90m(C:\Users\zahid\Downloads\ai-coding-tutor-main\backend\[39mservices\aiService.js:230:15[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+    at generateChallenge 
+[90m(C:\Users\zahid\Downloads\ai-coding-tutor-main\backend\[39mservices\aiService.js:255:27[90m)[39m
+    at C:/Users/zahid/Downloads/ai-coding-tutor-main/backend/routes/challenges.js:105:27
+
+ [32mΓ£ô[39m tests/integration/challenges-integration.test.js [2m([22m[2m14 tests[22m[2m)[22m[33m 4221[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m successfully generates a hint for authenticated user [33m 701[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m handles AI service failures gracefully [33m 1404[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m handles AI generation failures [33m 1426[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m      Tests [22m [1m[32m69 passed[39m[22m[90m (69)[39m
+[2m   Start at [22m 00:57:42
+[2m   Duration [22m 9.69s[2m (transform 1.14s, setup 2.17s, import 22.99s, tests 15.55s, environment 9ms)[22m
+
